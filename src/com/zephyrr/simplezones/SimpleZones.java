@@ -34,14 +34,14 @@ public class SimpleZones extends JavaPlugin {
 
     public void onEnable() {
         SimpleZones.serv = getServer();
-        // TODO: Change this to use the config file.
+        prefix = getConfig().getString("database.prefix");
         db = new MySQL(getLogger(),
                 prefix,
-                "localhost",
-                "3306",
-                "simplezones",
-                "simplezones",
-                "simplezones");
+                getConfig().getString("database.mysql.host"),
+                getConfig().getString("database.mysql.port"),
+                getConfig().getString("database.mysql.database"),
+                getConfig().getString("database.mysql.username"),
+                getConfig().getString("database.mysql.password"));
         db.open();
         firstRun();
         Town.fill(db, prefix);

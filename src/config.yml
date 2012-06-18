@@ -1,0 +1,9 @@
+database:
+  type: mysql
+  prefix: SZ_
+  mysql:
+    host: localhost
+    port: 3306
+    database: simplezones
+    username: simplezones
+    password: simplezones
