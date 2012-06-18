@@ -240,6 +240,7 @@ public class ZonePlayer {
                     town.setWarp(player.getLocation());
                     Town.addTown(town);
                     player.sendMessage(ChatColor.GOLD + "[SimpleZones] You are now the owner of " + name);
+                    Town.save(db, prefix);
                 } catch (SQLException ex) {
                     ex.printStackTrace();
                 }
