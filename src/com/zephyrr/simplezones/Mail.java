@@ -1,10 +1,19 @@
 package com.zephyrr.simplezones;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import org.bukkit.ChatColor;
+import org.yaml.snakeyaml.Yaml;
 import sqlibrary.Database;
+import com.zephyrr.simplezones.ymlIO.MailYml;
+import java.io.FileWriter;
+import java.util.ArrayList;
+import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
 
 /**
  *
@@ -12,6 +21,10 @@ import sqlibrary.Database;
  */
 public class Mail {
     public static void save(Database db, String prefix) {
+        if(db == null) {
+            saveYML();
+            return;
+        }
         int id = 0;
         db.wipeTable(prefix + "mail");
         for(ZonePlayer zone : ZonePlayer.getPMap().values()) {
@@ -34,6 +47,10 @@ public class Mail {
     }
 
     public static void fill(Database db, String prefix) {
+        if(db == null) {
+            fillYML();
+            return;
+        }
         Collection<ZonePlayer> collection = ZonePlayer.getPMap().values();
         for(ZonePlayer z : collection) {
             try {
@@ -54,6 +71,57 @@ public class Mail {
             } catch(SQLException ex) {
                 ex.printStackTrace();
             }
+        }
+    }
+
+    private static void saveYML() {
+        try {
+            File out = new File("plugins/SimpleZones/mail.yml");
+            if(!out.exists())
+                out.createNewFile();
+            ArrayList<MailYml> al = new ArrayList<MailYml>();
+            for(ZonePlayer zp : ZonePlayer.getPMap().values()) {
+                for(Mail m : zp.getMailList()) {
+                    MailYml myml = new MailYml();
+                    myml.contents = m.message;
+                    myml.receiver = zp.getID();
+                    myml.sender = m.from.getID();
+                    myml.unread = m.read;
+                    al.add(myml);
+                }
+            }
+            new Yaml().dumpAll(al.iterator(), new FileWriter(out));
+        } catch(IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private static void fillYML() {
+        File in = new File("plugins/SimpleZones/mail.yml");
+        if(!in.exists())
+            return;
+        try {
+            InputStream stream = new FileInputStream(in);
+            Yaml yaml = new Yaml(new CustomClassLoaderConstructor(MailYml.class.getClassLoader()));
+            for(Object o : yaml.loadAll(stream)) {
+                MailYml myml = (MailYml)o;
+                String msg = myml.contents;
+                boolean read = myml.unread;
+                int sender = myml.sender;
+                int receiver = myml.receiver;
+                ZonePlayer to = null, from = null;
+                for(ZonePlayer zp : ZonePlayer.getPMap().values()) {
+                    if(zp.getID() == sender) {
+                        from = zp;
+                    } else if(zp.getID() == receiver) {
+                        to = zp;
+                    }
+                }
+                Mail m = new Mail(msg, read, from);
+                to.sendMail(m);
+            }
+        } catch(IOException ex) {
+            ex.printStackTrace();
         }
     }
 

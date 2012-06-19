@@ -1,5 +1,5 @@
 database:
-  type: mysql
+  type: yml
   prefix: SZ_
   mysql:
     host: localhost

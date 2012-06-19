@@ -1,5 +1,11 @@
 package com.zephyrr.simplezones;
 
+import com.zephyrr.simplezones.ymlIO.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -8,6 +14,9 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
+import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
 import sqlibrary.Database;
 
 /**
@@ -31,6 +40,10 @@ public class Town extends OwnedLand {
         return null;
     }
     public static void fill(Database db, String prefix) {
+        if(db == null) {
+            fillYML();
+            return;
+        }
         try {
             ResultSet rs = db.query("SELECT * FROM " + prefix + "towns");
             while(rs.next()) {
@@ -62,6 +75,10 @@ public class Town extends OwnedLand {
         }
     }
     public static void save(Database db, String prefix) {
+        if(db == null) {
+            saveYML();
+            return;
+        }
         db.wipeTable(prefix + "towns");
         for(Town t : townList.values()) {
             String name = t.getName();
@@ -97,7 +114,70 @@ public class Town extends OwnedLand {
             db.query(query);
         }
     }
+
+    public static void fillYML() {
+        File in = new File("plugins/SimpleZones/towns.yml");
+        if(!in.exists())
+            return;
+        try {
+            InputStream input = new FileInputStream(in);
+            Yaml yaml = new Yaml(new CustomClassLoaderConstructor(TownYml.class.getClassLoader()));
+            for(Object o : yaml.loadAll(input)) {
+                TownYml ty = (TownYml)o;
+                Location low = new Location(SimpleZones.getWorld(ty.world), ty.lowX, OwnedLand.YCHECK, ty.lowZ);
+                Location high = new Location(SimpleZones.getWorld(ty.world), ty.highX, OwnedLand.YCHECK, ty.highZ);
+                Location warp = new Location(low.getWorld(), ty.warpX, ty.warpY, ty.warpZ);
+                int id = ty.tid;
+                String[] members = ty.members.split(",");
+                Town t = new Town(id, low, high, ty.name);
+                for(String s : members)
+                    t.addMember(s);
+                t.setOwner(ty.owner);
+                t.setWarp(warp);
+                townList.put(ty.name, t);
+            }
+            input.close();
+        } catch(IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public static void saveYML() {
+        ArrayList<TownYml> val = new ArrayList<TownYml>();
+        for(Town t : Town.getTownList().values()) {
+            TownYml ty = new TownYml();
+            ty.highX = t.getUpperBound().getBlockX();
+            ty.highZ = t.getUpperBound().getBlockZ();
+            ty.lowX = t.getLowerBound().getBlockX();
+            ty.lowZ = t.getLowerBound().getBlockZ();
+            ty.members = t.getMembers().toString().substring(1, t.getMembers().toString().length() - 1);
+            ty.name = t.getName();
+            ty.owner = t.getOwner();
+            ty.tid = t.getID();
+            ty.warpX = t.getWarp().getX();
+            ty.warpY = t.getWarp().getY();
+            ty.warpZ = t.getWarp().getZ();
+            ty.world = t.getWarp().getWorld().getName();
+            val.add(ty);
+        }
+        try {
+            File out = new File("plugins/SimpleZones/towns.yml");
+            if(!out.exists())
+                out.createNewFile();
+            FileWriter fw = new FileWriter(out);
+            Yaml yml = new Yaml();
+            yml.dumpAll(val.iterator(), fw);
+            fw.close();
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void fillBans(Database db, String prefix) {
+        if(db == null) {
+            fillBansYML();
+            return;
+        }
         ResultSet rs = db.query("SELECT * FROM " + prefix + "bans");
         try {
             while(rs.next()) {
@@ -112,6 +192,10 @@ public class Town extends OwnedLand {
         }
     }
     public static void saveBans(Database db, String prefix) {
+        if(db == null) {
+            saveBansYML();
+            return;
+        }
         db.wipeTable(prefix + "bans");
         int id = 0;
         for(Town t : townList.values()) {
@@ -126,6 +210,48 @@ public class Town extends OwnedLand {
                 db.query(query);
                 id++;
             }
+        }
+    }
+    public static void fillBansYML() {
+        File in = new File("plugins/SimpleZones/bans.yml");
+        if(!in.exists())
+            return;
+        try {
+            InputStream fis = new FileInputStream(in);
+            Yaml yaml = new Yaml(new CustomClassLoaderConstructor(BanYml.class.getClassLoader()));
+            for(Object o : yaml.loadAll(fis)) {
+                BanYml ban = (BanYml)o;
+                String user = ban.user;
+                int tid = ban.tid;
+                for(Town t : Town.townList.values())
+                    if(t.getID() == tid)
+                        t.addBan(ZonePlayer.findUser(user));
+            }
+            fis.close();
+        } catch(IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+    public static void saveBansYML() {
+        ArrayList<BanYml> list = new ArrayList<BanYml>();
+        for(Town t : Town.getTownList().values()) {
+            for(ZonePlayer zp : t.getBans()) {
+                BanYml yml = new BanYml();
+                yml.tid = t.getID();
+                yml.user = zp.getName();
+                list.add(yml);
+            }
+        }
+        try {
+            File out = new File("plugins/SimpleZones/bans.yml");
+            if(!out.exists())
+                out.createNewFile();
+            Yaml yml = new Yaml();
+            FileWriter fw = new FileWriter(out);
+            yml.dumpAll(list.iterator(), fw);
+            fw.close();
+        } catch(IOException ex) {
+            ex.printStackTrace();
         }
     }
     private String name, owner;

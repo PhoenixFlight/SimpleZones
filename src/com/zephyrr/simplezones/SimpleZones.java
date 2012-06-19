@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import sqlibrary.*;
 import com.zephyrr.simplezones.listeners.*;
+import org.yaml.snakeyaml.Yaml;
 
 /**
  *
@@ -35,20 +36,28 @@ public class SimpleZones extends JavaPlugin {
     public void onEnable() {
         SimpleZones.serv = getServer();
         prefix = getConfig().getString("database.prefix");
-        db = new MySQL(getLogger(),
+        String type = getConfig().getString("database.type");
+        if(type.equalsIgnoreCase("mysql"))
+            db = new MySQL(getLogger(),
                 prefix,
                 getConfig().getString("database.mysql.host"),
                 getConfig().getString("database.mysql.port"),
                 getConfig().getString("database.mysql.database"),
                 getConfig().getString("database.mysql.username"),
                 getConfig().getString("database.mysql.password"));
-        db.open();
-        firstRun();
+        if(db != null) {
+            db.open();
+            firstRun();
+        }
         Town.fill(db, prefix);
         Plot.fill(db, prefix);
         ZonePlayer.fill(db, prefix);
         Town.fillBans(db, prefix);
         Mail.fill(db, prefix);
+        
+        if (!new File("plugins/SimpleZones/config.yml").exists()) {
+            saveDefaultConfig();
+        }
 
         for(Player p : getServer().getOnlinePlayers()) {
             ZonePlayer.registerUser(p);
@@ -59,7 +68,7 @@ public class SimpleZones extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerListener(), this);
     }
 
-    private boolean firstRun() {
+    private void firstRun() {
         if (!db.checkTable(prefix + "bans")) {
             db.createTable("CREATE TABLE " + prefix + "bans ("
                     + "P_Id int NOT NULL,"
@@ -119,12 +128,6 @@ public class SimpleZones extends JavaPlugin {
                     + "PRIMARY KEY (M_Id)"
                     + ")");
         }
-
-        if (!new File("plugins/SimpleZones/config.yml").exists()) {
-            saveDefaultConfig();
-        }
-
-        return true;
     }
 
     @Override
@@ -375,6 +378,7 @@ public class SimpleZones extends JavaPlugin {
         ZonePlayer.save(db, prefix);
         Town.saveBans(db, prefix);
         Mail.save(db, prefix);
-        db.close();
+        if(db != null)
+            db.close();
     }
 }

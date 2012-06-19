@@ -1,14 +1,21 @@
 package com.zephyrr.simplezones;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.logging.Logger;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.yaml.snakeyaml.Yaml;
 import sqlibrary.Database;
+import com.zephyrr.simplezones.ymlIO.PlayerYml;
+import java.io.FileWriter;
+import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
 
 /**
  *
@@ -23,6 +30,10 @@ public class ZonePlayer {
     }
 
     public static void fill(Database db, String prefix) {
+        if(db == null) {
+            fillYML();
+            return;
+        }
         ResultSet rs = db.query("SELECT * FROM " + prefix + "players");
         try {
             while (rs.next()) {
@@ -45,6 +56,10 @@ public class ZonePlayer {
     }
 
     public static void save(Database db, String prefix) {
+        if(db == null) {
+            saveYML();
+            return;
+        }
         db.wipeTable(prefix + "players");
         for (ZonePlayer zp : pMap.values()) {
             int id = zp.getID();
@@ -59,6 +74,56 @@ public class ZonePlayer {
                     + town
                     + ")";
             db.query(query);
+        }
+    }
+
+    public static void fillYML() {
+        try {
+            File f = new File("plugins/SimpleZones/players.yml");
+            if(!f.exists())
+                return;
+            InputStream in = new FileInputStream(f);
+            Yaml yml = new Yaml(new CustomClassLoaderConstructor(PlayerYml.class.getClassLoader()));
+            for(Object o : yml.loadAll(in)) {
+                PlayerYml pyml = (PlayerYml)o;
+                String name = pyml.name;
+                int id = pyml.id;
+                int tid = pyml.tid;
+                Town t = null;
+                if(tid != -1) {
+                    for(Town t2 : Town.getTownList().values())
+                        if(t2.getID() == tid)
+                            t = t2;
+                }
+                ZonePlayer zp = new ZonePlayer(name, id);
+                zp.setTown(t);
+                pMap.put(name, zp);
+            }
+            in.close();
+        } catch(IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public static void saveYML() {
+        try {
+            File f = new File("plugins/SimpleZones/players.yml");
+            if(!f.exists())
+                f.createNewFile();
+            ArrayList<PlayerYml> al = new ArrayList<PlayerYml>();
+            for(ZonePlayer zp : pMap.values()) {
+                PlayerYml pyml = new PlayerYml();
+                pyml.id = zp.getID();
+                pyml.name = zp.getName();
+                if(zp.getTown() == null)
+                    pyml.tid = -1;
+                else pyml.tid = zp.getTown().getID();
+                al.add(pyml);
+            }
+            Yaml yml = new Yaml();
+            yml.dumpAll(al.iterator(), new FileWriter(f));
+        } catch(IOException ex) {
+            ex.printStackTrace();
         }
     }
 
@@ -230,20 +295,17 @@ public class ZonePlayer {
             } else if (Town.getTown(name) != null) {
                 player.sendMessage(ChatColor.RED + "[SimpleZones] There is already a town named " + name);
             } else {
-                try {
-                    ResultSet rs = db.query("SELECT IFNULL(max(T_Id), 0) AS max FROM " + prefix + "towns");
-                    rs.next();
-                    int tid = rs.getInt("max") + 1;
-                    Town t = new Town(tid, corner1, corner2, name);
-                    town = t;
-                    t.setOwner(getName());
-                    town.setWarp(player.getLocation());
-                    Town.addTown(town);
-                    player.sendMessage(ChatColor.GOLD + "[SimpleZones] You are now the owner of " + name);
-                    Town.save(db, prefix);
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
+                int max = 1;
+                for(Town t : Town.getTownList().values())
+                    if(t.getID() >= max)
+                        max = t.getID() + 1;
+                Town t = new Town(max, corner1, corner2, name);
+                town = t;
+                t.setOwner(getName());
+                town.setWarp(player.getLocation());
+                Town.addTown(town);
+                player.sendMessage(ChatColor.GOLD + "[SimpleZones] You are now the owner of " + name);
+                Town.save(db, prefix);
             }
         }
         return true;
@@ -270,16 +332,14 @@ public class ZonePlayer {
         } else if (OwnedLand.hasOverlap(corner1, corner2, true)) {
             player.sendMessage(ChatColor.RED + "[SimpleZones] This plot overlaps with another.");
         } else {
-            try {
-                ResultSet rs = db.query("SELECT IFNULL(max(P_Id), -1) AS max FROM " + prefix + "plots WHERE TownID=" + town.getID());
-                rs.next();
-                int pid = rs.getInt("max") + 1;
-                Plot p = new Plot(pid, corner1, corner2, town);
-                town.addPlot(p);
-                player.sendMessage(ChatColor.GOLD + "[SimpleZones] You have added a new plot to " + town.getName());
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
+            int max = 0;
+            for(Town t : Town.getTownList().values())
+                for(Plot p : t.getPlots())
+                    if(p.getID() >= max)
+                        max = p.getID() + 1;
+            Plot p = new Plot(max, corner1, corner2, town);
+            town.addPlot(p);
+            player.sendMessage(ChatColor.GOLD + "[SimpleZones] You have added a new plot to " + town.getName());
         }
         return true;
     }
