@@ -305,7 +305,6 @@ public class ZonePlayer {
                 town.setWarp(player.getLocation());
                 Town.addTown(town);
                 player.sendMessage(ChatColor.GOLD + "[SimpleZones] You are now the owner of " + name);
-                Town.save(db, prefix);
             }
         }
         return true;
@@ -340,6 +339,18 @@ public class ZonePlayer {
             Plot p = new Plot(max, corner1, corner2, town);
             town.addPlot(p);
             player.sendMessage(ChatColor.GOLD + "[SimpleZones] You have added a new plot to " + town.getName());
+        }
+        return true;
+    }
+
+    public boolean plotDelete() {
+        if(town == null || !town.getOwner().equals(name)) {
+            player.sendMessage(ChatColor.RED + "[SimpleZones] You aren't the owner of a town.");
+        } else if(!town.getPlots().contains(OwnedLand.getLandAtPoint(player.getLocation()))) {
+            player.sendMessage(ChatColor.RED + "[SimpleZones] You aren't standing in a plot.");
+        } else {
+            town.getPlots().remove(OwnedLand.getLandAtPoint(player.getLocation()));
+            player.sendMessage(ChatColor.GOLD + "[SimpleZones] This plot has been deleted.");
         }
         return true;
     }
@@ -384,7 +395,7 @@ public class ZonePlayer {
             player.sendMessage(ChatColor.GOLD + "[SimpleZones] You are no longer the owner of " + town.getName());
             ZonePlayer zp = ZonePlayer.findUser(name);
             if(!zp.getPlayer().isOnline()) {
-                Mail notif = new Mail("You have been given ownership of " + town.getName() + " by " + getName(), false, this);
+                Mail notif = new Mail("You have been given ownership of " + town.getName() + " by " + getName(), false, this, false);
                 zp.sendMail(notif);
             } else {
                 zp.getPlayer().sendMessage(ChatColor.GOLD + "[SimpleZones] You are now the owner of " + town.getName());
@@ -402,15 +413,22 @@ public class ZonePlayer {
         } else if(town == null || !town.getOwner().equals(getName())) {
             player.sendMessage(ChatColor.RED + "[SimpleZones] You do not own a town.");
         } else {
-            zp.setTown(town);
-            player.sendMessage(ChatColor.GOLD + "[SimpleZones] You have added " + name + " to your town.");
-            if(zp.getPlayer() != null && zp.getPlayer().isOnline()) {
-                zp.getPlayer().sendMessage(ChatColor.GOLD + "[SimpleZones] You have been added to " + town.getName());
-            } else {
-                Mail notif = new Mail("You have been added to " + town.getName(), false, this);
-                zp.sendMail(notif);
+            for(Mail m : mail) {
+                if(m.isInvite() && m.getSender().equals(zp)) {
+                    zp.setTown(town);
+                    player.sendMessage(ChatColor.GOLD + "[SimpleZones] You have added " + name + " to your town.");
+                    if(zp.getPlayer() != null && zp.getPlayer().isOnline()) {
+                        zp.getPlayer().sendMessage(ChatColor.GOLD + "[SimpleZones] You have been added to " + town.getName());
+                    } else {
+                        Mail notif = new Mail("You have been added to " + town.getName(), false, this, false);
+                        zp.sendMail(notif);
+                    }
+                    town.addMember(name);
+                    mail.remove(m);
+                    return true;
+                }
             }
-            town.addMember(name);
+            zp.sendMail(new Mail("You have been invited to " + town.getName() + ".  Use /zone join " + town.getName() + " to accept.", false, this, true));
         }
         return true;
     }
@@ -428,7 +446,7 @@ public class ZonePlayer {
             if(zp.getPlayer() != null && zp.getPlayer().isOnline()) {
                 zp.getPlayer().sendMessage(ChatColor.GOLD + "[SimpleZones] You have been banned from " + town.getName());
             } else {
-                Mail notif = new Mail("You have been banned from " + town.getName(), false, this);
+                Mail notif = new Mail("You have been banned from " + town.getName(), false, this, false);
                 zp.sendMail(notif);
             }
             player.sendMessage(ChatColor.GOLD + "[SimpleZones] " + name + " has been banned from " + town.getName());
@@ -448,7 +466,7 @@ public class ZonePlayer {
             if(zp.getPlayer() != null && zp.getPlayer().isOnline()) {
                 zp.getPlayer().sendMessage(ChatColor.GOLD + "[SimpleZones] You have been unbanned from " + town.getName());
             } else {
-                Mail notif = new Mail("You have been unbanned from " + town.getName(), false, this);
+                Mail notif = new Mail("You have been unbanned from " + town.getName(), false, this, false);
                 zp.sendMail(notif);
             }
             player.sendMessage(ChatColor.GOLD + "[SimpleZones] " + name + " has been unbanned from " + town.getName());
@@ -482,7 +500,7 @@ public class ZonePlayer {
                 ZonePlayer zp = ZonePlayer.findUser(s);
                 if(zp == null)
                     continue;
-                zp.sendMail(new Mail("The town \"" + town.getName() + "\" has been deleted.", false, this));
+                zp.sendMail(new Mail("The town \"" + town.getName() + "\" has been deleted.", false, this, false));
                 zp.setTown(null);
             }
             Town.getTownList().remove(town.getName());
@@ -501,7 +519,15 @@ public class ZonePlayer {
             player.sendMessage(ChatColor.RED + "[SimpleZones] You are banned from " + s);
         } else {
             ZonePlayer owner = ZonePlayer.findUser(Town.getTown(s).getOwner());
-            owner.sendMail(new Mail(name + " would like to join " + Town.getTown(s).getName(), false, this));
+            for(Mail m : mail) {
+                if(m.getSender().equals(owner) && m.isInvite()) {
+                    setTown(owner.getTown());
+                    owner.getTown().addMember(name);
+                    mail.remove(m);
+                    return true;
+                }
+            }
+            owner.sendMail(new Mail(name + " would like to join " + Town.getTown(s).getName(), false, this, true));
             player.sendMessage(ChatColor.GOLD + "[SimpleZones] The owner of " + s + " has been notified of your request.");
         }
         return true;

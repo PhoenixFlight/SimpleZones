@@ -38,7 +38,8 @@ public class Mail {
                         + senderID + ","
                         + toID + ","
                         + "'" + contents + "',"
-                        + read
+                        + read + ","
+                        + m.isInvite()
                         + ")";
                 db.query(query);
                 id++;
@@ -59,13 +60,14 @@ public class Mail {
                     int sender = rs.getInt("SenderID");
                     String contents = rs.getString("Contents");
                     boolean read = rs.getBoolean("Unread");
+                    boolean invite = rs.getBoolean("Invite");
                     ZonePlayer send = null;
                     for(ZonePlayer zone : collection)
                         if(zone.getID() == sender) {
                             send = zone;
                             break;
                         }
-                    Mail mail = new Mail(contents, read, send);
+                    Mail mail = new Mail(contents, read, send, invite);
                     z.sendMail(mail);
                 }
             } catch(SQLException ex) {
@@ -87,6 +89,7 @@ public class Mail {
                     myml.receiver = zp.getID();
                     myml.sender = m.from.getID();
                     myml.unread = m.read;
+                    myml.invite = m.isInvite();
                     al.add(myml);
                 }
             }
@@ -109,6 +112,7 @@ public class Mail {
                 boolean read = myml.unread;
                 int sender = myml.sender;
                 int receiver = myml.receiver;
+                boolean invite = myml.invite;
                 ZonePlayer to = null, from = null;
                 for(ZonePlayer zp : ZonePlayer.getPMap().values()) {
                     if(zp.getID() == sender) {
@@ -117,7 +121,7 @@ public class Mail {
                         to = zp;
                     }
                 }
-                Mail m = new Mail(msg, read, from);
+                Mail m = new Mail(msg, read, from, invite);
                 to.sendMail(m);
             }
         } catch(IOException ex) {
@@ -126,9 +130,9 @@ public class Mail {
     }
 
     private String message;
-    private boolean read;
+    private boolean read, invite;
     private ZonePlayer from;
-    public Mail(String msg, boolean read, ZonePlayer sender) {
+    public Mail(String msg, boolean read, ZonePlayer sender, boolean invite) {
         message = msg;
         this.read = read;
         from = sender;
@@ -140,6 +144,12 @@ public class Mail {
     }
     public boolean isUnread() {
         return !read;
+    }
+    public ZonePlayer getSender() {
+        return from;
+    }
+    public boolean isInvite() {
+        return invite;
     }
     public String getInfo() {
         return ChatColor.GOLD + "Sender: " + from.getName() + "\nRead: " + read;

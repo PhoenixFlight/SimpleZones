@@ -1,6 +1,6 @@
 name: SimpleZones
 main: com.zephyrr.simplezones.SimpleZones
-version: 0.1
+version: 0.3
 author: PhoenixFlight
 permissions:
   Zone.*:
@@ -47,6 +47,8 @@ permissions:
     description: Allows users to add members to plots.
   Zone.plot.removemember:
     description: Allows users to remove members from a plot.
+  Zone.plot.delete:
+    description: Allows town owners to delete plots in their town.
   Zone.delete:
     description: Allows a user to delete their town.
     default: false
@@ -72,6 +74,7 @@ permissions:
       Zone.plot.define: true
       Zone.plot.addmember: true
       Zone.plot.removemember: true
+      Zone.plot.delete: true
   Mail.send:
     description: Allows the user to send mail.
     default: true

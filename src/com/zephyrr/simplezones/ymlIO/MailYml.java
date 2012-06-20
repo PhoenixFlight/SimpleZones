@@ -9,4 +9,5 @@ public class MailYml {
     public int receiver;
     public String contents;
     public boolean unread;
+    public boolean invite;
 }
