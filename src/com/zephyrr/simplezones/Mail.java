@@ -136,6 +136,7 @@ public class Mail {
         message = msg;
         this.read = read;
         from = sender;
+        this.invite = invite;
     }
     public String read() {
         read = true;

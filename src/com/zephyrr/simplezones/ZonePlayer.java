@@ -150,11 +150,13 @@ public class ZonePlayer {
     private int id;
     private Location corner1, corner2;
     private String name;
+    private Channel active;
 
     public ZonePlayer(String name, int id) {
         player = SimpleZones.getPlayer(name);
         this.id = id;
         this.name = name;
+        active = Channel.GLOBAL;
         mail = new ArrayList<Mail>();
         corner1 = new Location(SimpleZones.getDefaultWorld(), 0, 0, 0);
         corner2 = corner1.clone();
@@ -185,6 +187,10 @@ public class ZonePlayer {
             return false;
         }
         return ((ZonePlayer) o).getName().equals(getName());
+    }
+
+    public Channel getChannel() {
+        return active;
     }
 
     public void setTown(Town t) {
@@ -284,6 +290,13 @@ public class ZonePlayer {
         return true;
     }
 
+    public boolean toggleChannel() {
+        if(active == Channel.GLOBAL)
+            active = Channel.TOWN;
+        else active = Channel.GLOBAL;
+        return true;
+    }
+
     public boolean create(String name, Database db, String prefix) {
         if (town != null) {
             player.sendMessage(ChatColor.RED + "[SimpleZones] You can only be in one town at a time.");
@@ -349,6 +362,7 @@ public class ZonePlayer {
         } else if(!town.getPlots().contains(OwnedLand.getLandAtPoint(player.getLocation()))) {
             player.sendMessage(ChatColor.RED + "[SimpleZones] You aren't standing in a plot.");
         } else {
+            OwnedLand.defineLocations(town);
             town.getPlots().remove(OwnedLand.getLandAtPoint(player.getLocation()));
             player.sendMessage(ChatColor.GOLD + "[SimpleZones] This plot has been deleted.");
         }
@@ -544,6 +558,18 @@ public class ZonePlayer {
                 p.removeMember(name);
             player.sendMessage(ChatColor.GOLD + "[SimpleZones] You have been removed from " + town.getName());
             town = null;
+        }
+        return true;
+    }
+
+    public boolean massmail(String msg) {
+        if(town == null || !town.getOwner().equals(getName())) {
+            player.sendMessage(ChatColor.RED + "[SimpleZones] You are not the owner of a town.");
+        } else {
+            for(String s : town.getMembers()) {
+                ZonePlayer zp = ZonePlayer.findUser(s);
+                zp.sendMail(new Mail(msg, false, this, false));
+            }
         }
         return true;
     }

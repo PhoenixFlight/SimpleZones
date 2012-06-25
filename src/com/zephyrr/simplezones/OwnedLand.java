@@ -19,9 +19,10 @@ public abstract class OwnedLand {
         Location low = sender.getLowerBound();
         Location high = sender.getUpperBound();
         for(int r = low.getBlockX(); r <= high.getBlockX(); r++) {
-            for(int c = low.getBlockZ(); c < high.getBlockZ(); c++) {
+            for(int c = low.getBlockZ(); c <= high.getBlockZ(); c++) {
                 Location toPlace = new Location(low.getWorld(), r, YCHECK, c);
-                locIndex.put(toPlace, sender);
+                if(getLandAtPoint(toPlace) == null)
+                    locIndex.put(toPlace, sender);
             }
         }
     }

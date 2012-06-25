@@ -131,7 +131,7 @@ public class Town extends OwnedLand {
                 String[] members = ty.members.split(",");
                 Town t = new Town(id, low, high, ty.name);
                 for(String s : members)
-                    t.addMember(s);
+                    t.addMember(s.replaceAll(" ", ""));
                 t.setOwner(ty.owner);
                 t.setWarp(warp);
                 townList.put(ty.name, t);

@@ -1,6 +1,6 @@
 name: SimpleZones
 main: com.zephyrr.simplezones.SimpleZones
-version: 0.3
+version: 0.4
 author: PhoenixFlight
 permissions:
   Zone.*:
@@ -20,7 +20,10 @@ permissions:
       Zone.warp: true
       Zone.join: true
       Zone.leave: true
+      Zone.massmail: true
       Zone.help: true
+  Zone.massmail:
+    description: Allows town owners to send mass mails to their entire town.
   Zone.define:
     description: Allows users to define boundaries for new Towns.
   Zone.create:
@@ -98,8 +101,21 @@ permissions:
       Mail.info: true
       Mail.help: true
       Mail.delete: true
+  Zchat.*:
+    description: Gives a user access to all Zone Chat commands.
+    children:
+      Zchat.toggle: true
+      Zchat.toggleview: true
+  Zchat.toggle:
+    description: Allows a user to toggle their chat channel.
+    default: true
+  Zchat.toggleview:
+    description: Allows a user to toggle whether or not to view all chat channels.
+    default: true
 commands:
   zone:
     usage: /zone help [#]
   mail:
     usage: /mail help
+  zchat:
+    usage: /zchat help

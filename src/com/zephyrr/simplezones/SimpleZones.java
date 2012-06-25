@@ -2,7 +2,6 @@ package com.zephyrr.simplezones;
 
 import java.io.File;
 import org.bukkit.ChatColor;
-import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -11,6 +10,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import sqlibrary.*;
 import com.zephyrr.simplezones.listeners.*;
 import java.util.ArrayList;
+import org.bukkit.configuration.file.FileConfiguration;
 
 /**
  *
@@ -18,24 +18,28 @@ import java.util.ArrayList;
  */
 public class SimpleZones extends JavaPlugin {
 
-    private static Server serv;
+    private static JavaPlugin plug;
 
     public static Player getPlayer(String name) {
-        return serv.getPlayer(name);
+        return plug.getServer().getPlayer(name);
+    }
+
+    public static FileConfiguration getPlugConfig() {
+        return plug.getConfig();
     }
 
     public static World getWorld(String name) {
-        return serv.getWorld(name);
+        return plug.getServer().getWorld(name);
     }
 
     public static World getDefaultWorld() {
-        return serv.getWorlds().get(0);
+        return plug.getServer().getWorlds().get(0);
     }
     private Database db;
-    private String prefix = "SZ_";
+    private String prefix;
 
     public void onEnable() {
-        SimpleZones.serv = getServer();
+        SimpleZones.plug = this;
         prefix = getConfig().getString("database.prefix");
         String type = getConfig().getString("database.type");
         if (type.equalsIgnoreCase("mysql")) {
@@ -167,7 +171,14 @@ public class SimpleZones extends JavaPlugin {
                 }
                 return false;
             }
-            if (args[0].equalsIgnoreCase("define") && sender.hasPermission("Zone.define")) {
+            if(args[0].equalsIgnoreCase("massmail") && sender.hasPermission("Zone.massmail")) {
+                if(args.length == 1)
+                    return false;
+                String msg = "";
+                for(int i = 1; i < args.length; i++)
+                    msg += args[i];
+                return zoneSender.massmail(msg);
+            } else if (args[0].equalsIgnoreCase("define") && sender.hasPermission("Zone.define")) {
                 return zoneSender.define();
             } else if (args[0].equalsIgnoreCase("create") && sender.hasPermission("Zone.create")) {
                 if (args.length == 1) {
@@ -269,6 +280,14 @@ public class SimpleZones extends JavaPlugin {
                 }
                 return true;
             }
+        } else if(command.getName().equalsIgnoreCase("zchat")) {
+            if(args[0].equalsIgnoreCase("toggle") && send.hasPermission("Zchat.toggle")) {
+                zoneSender.toggleChannel();
+                send.sendMessage(ChatColor.GOLD + "[SimpleZones] Your active chat channel has been set to " + zoneSender.getChannel().name().toLowerCase());
+                return true;
+            } else if(args[0].equalsIgnoreCase("help") && send.hasPermission("Zchat.help")) {
+                showChatHelp(send);
+            }
         }
         return false;
     }
@@ -300,6 +319,16 @@ public class SimpleZones extends JavaPlugin {
         }
     }
 
+    private void showChatHelp(Player p) {
+        ArrayList<String> al = new ArrayList<String>();
+        if(p.hasPermission("Zchat.toggle")) {
+            al.add(ChatColor.GREEN + "/zchat toggle");
+            al.add(ChatColor.GOLD + "Toggles your active chat channel between town and global.");
+        }
+        for(String s : al)
+            p.sendMessage(s);
+    }
+
     private void showTownHelp(Player p, String[] args) {
         int page = 1;
         if (args.length != 1) {
@@ -316,6 +345,10 @@ public class SimpleZones extends JavaPlugin {
         if (p.hasPermission("Zone.create")) {
             al.add(ChatColor.GREEN + "/zone create <name>");
             al.add(ChatColor.GOLD + "Creates a town from the selection.");
+        }
+        if (p.hasPermission("Zone.massmail")) {
+            al.add(ChatColor.GREEN + "/zone massmail <message>");
+            al.add(ChatColor.GOLD + "Sends a mail message to all members of your town.");
         }
         if (p.hasPermission("Zone.setowner")) {
             al.add(ChatColor.GREEN + "/zone setowner <player>");
@@ -348,6 +381,10 @@ public class SimpleZones extends JavaPlugin {
         if (p.hasPermission("Zone.plot.create")) {
             al.add(ChatColor.GREEN + "/zone plot create");
             al.add(ChatColor.GOLD + "Creates a plot from the given selection.");
+        }
+        if(p.hasPermission("Zone.plot.delete")) {
+            al.add(ChatColor.GREEN + "/zone plot delete");
+            al.add(ChatColor.GOLD + "Deletes the plot in which you are currently standing.");
         }
         if (p.hasPermission("Zone.plot.addmember")) {
             al.add(ChatColor.GREEN + "/zone plot addmember <player>");
