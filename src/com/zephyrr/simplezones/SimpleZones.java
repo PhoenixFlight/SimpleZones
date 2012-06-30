@@ -19,7 +19,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 public class SimpleZones extends JavaPlugin {
 
     private static JavaPlugin plug;
-
+    private static double VERSION = 0.5;
     public static Player getPlayer(String name) {
         return plug.getServer().getPlayer(name);
     }
@@ -55,6 +55,10 @@ public class SimpleZones extends JavaPlugin {
             db.open();
             firstRun();
         }
+
+        if(getConfig().getDouble("version") != VERSION)
+            updateResources();
+
         Town.fill(db, prefix);
         Plot.fill(db, prefix);
         ZonePlayer.fill(db, prefix);
@@ -72,6 +76,11 @@ public class SimpleZones extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new BlockListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerListener(), this);
+    }
+
+    private void updateResources() {
+        
+        saveDefaultConfig();
     }
 
     private void firstRun() {
@@ -170,8 +179,9 @@ public class SimpleZones extends JavaPlugin {
                     return zoneSender.plotDelete();
                 }
                 return false;
-            }
-            if(args[0].equalsIgnoreCase("massmail") && sender.hasPermission("Zone.massmail")) {
+            } else if(args[0].equalsIgnoreCase("flag") && sender.hasPermission("Zone.flag")) {
+                return zoneSender.flag(args);
+            } else if(args[0].equalsIgnoreCase("massmail") && sender.hasPermission("Zone.massmail")) {
                 if(args.length == 1)
                     return false;
                 String msg = "";

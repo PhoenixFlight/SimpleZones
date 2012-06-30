@@ -1,3 +1,20 @@
+version: 0.5
+default-flags:
+  monsters:
+    cave_spider: true
+    creeper: true
+    ender_dragon: true
+    enderman: true
+    ghast: true
+    giant: true
+    magma_cube: true
+    pig_zombie: true
+    silverfish: true
+    skeleton: true
+    slime: true
+    spider: true
+    squid: true
+    zombie: true
 database:
   type: yml
   prefix: SZ_

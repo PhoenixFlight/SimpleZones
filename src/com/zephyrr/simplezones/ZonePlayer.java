@@ -276,6 +276,18 @@ public class ZonePlayer {
         }
     }
 
+    private void showFlagList() {
+        ArrayList<String> flags = new ArrayList<String>();
+        flags.add("f - Enable/disable the spreading and burning of objects.  Fire can still be placed, but it won't do any damage.");
+        flags.add("e - Enable/disable explosions.  This includes creepers, TNT, and anything else that goes boom.");
+        flags.add("b# - Blocks or unblocks the placing of the block with id # in your town.  Example: /zone flag +b17 will block users from placing Wood in your town.");
+        flags.add("m[#] - Blocks or unblocks all or specific monsters.  Specific monster listings are available via /zone mIdList.  Example: /zone flag +m4 will block Creepers from your town.");
+        flags.add("a[#] - Blocks or unblocks all or specific animals.  Specific animal listings are available via /zone aIdList.  Example: /zone flag +a2 will block Chickens from your town.");
+        player.sendMessage(ChatColor.GOLD + "[SimpleZones] Town Flags");
+        for(String s : flags)
+            player.sendMessage(ChatColor.GOLD + s);
+    }
+
     /******************************************************************************
      * SIMPLEZONES COMMANDS
      ******************************************************************************/
@@ -286,6 +298,19 @@ public class ZonePlayer {
             corner1 = null;
             corner2 = null;
             player.sendMessage(ChatColor.GOLD + "Strike the first corner of your new town.");
+        }
+        return true;
+    }
+
+    public boolean flag(String[] args) {
+        if(town == null || !town.getOwner().equals(getName())) {
+            player.sendMessage(ChatColor.RED + "[SimpleZones] You are not the owner of a town.");
+            return true;
+        }
+        if(args.length == 1) {
+            showFlagList();
+        } else {
+            town.setFlag(args[1]);
         }
         return true;
     }

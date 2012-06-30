@@ -109,9 +109,6 @@ permissions:
   Zchat.toggle:
     description: Allows a user to toggle their chat channel.
     default: true
-  Zchat.toggleview:
-    description: Allows a user to toggle whether or not to view all chat channels.
-    default: true
 commands:
   zone:
     usage: /zone help [#]

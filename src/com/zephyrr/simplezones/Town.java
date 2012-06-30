@@ -1,5 +1,6 @@
 package com.zephyrr.simplezones;
 
+import com.zephyrr.simplezones.flags.FlagSet;
 import com.zephyrr.simplezones.ymlIO.*;
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,7 +16,6 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
 import sqlibrary.Database;
 
@@ -258,11 +258,13 @@ public class Town extends OwnedLand {
     private ArrayList<ZonePlayer> bans;
     private Location warp;
     private ArrayList<Plot> plots;
+    private FlagSet flags;
     public Town(int id, Location first, Location second, String name) {
         super(id, first, second);
         this.name = name;
         bans = new ArrayList<ZonePlayer>();
         plots = new ArrayList<Plot>();
+        flags = new FlagSet();
     }
     public void addPlot(Plot p) {
         plots.add(p);
@@ -323,5 +325,8 @@ public class Town extends OwnedLand {
     }
     public void setWarp(Location warp) {
         this.warp = warp;
+    }
+    public boolean setFlag(String s) {
+        return flags.setFlag(s);
     }
 }
