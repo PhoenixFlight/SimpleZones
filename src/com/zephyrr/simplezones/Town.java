@@ -58,6 +58,11 @@ public class Town extends OwnedLand {
                 double warpY = rs.getInt("WarpY");
                 double warpZ = rs.getInt("WarpZ");
                 String world = rs.getString("World");
+                String monsters = rs.getString("Monsters");
+                String animals = rs.getString("Animals");
+                String blocks = rs.getString("Blocks");
+                boolean fire = rs.getBoolean("Fire");
+                boolean explode = rs.getBoolean("Bomb");
                 World w = SimpleZones.getWorld(world);
                 Location warp = new Location(w, warpX, warpY, warpZ);
                 String[] members = rs.getString("Members").split(",");
@@ -68,6 +73,7 @@ public class Town extends OwnedLand {
                 t.setWarp(warp);
                 for(String s : members)
                     t.addMember(s);
+                t.putFlags(animals, monsters, blocks, fire, explode);
                 townList.put(name, t);
             }
         } catch(SQLException ex) {
@@ -109,7 +115,12 @@ public class Town extends OwnedLand {
                     + warpY + ","
                     + warpZ + ","
                     + "'" + world + "',"
-                    + "'" + members + "'"
+                    + "'" + members + "',"
+                    + "'" + t.getData('a') + "',"
+                    + "'" + t.getData('m') + "',"
+                    + "'" + t.getData('b') + "',"
+                    + "'" + t.getData('f') + "',"
+                    + "'" + t.getData('e') + "'"
                     + ")";
             db.query(query);
         }
@@ -134,6 +145,7 @@ public class Town extends OwnedLand {
                     t.addMember(s.replaceAll(" ", ""));
                 t.setOwner(ty.owner);
                 t.setWarp(warp);
+                t.putFlags(ty.animals, ty.monsters, ty.blocks, ty.fire, ty.bomb);
                 townList.put(ty.name, t);
             }
             input.close();
@@ -158,6 +170,11 @@ public class Town extends OwnedLand {
             ty.warpY = t.getWarp().getY();
             ty.warpZ = t.getWarp().getZ();
             ty.world = t.getWarp().getWorld().getName();
+            ty.animals = t.getData('a');
+            ty.blocks = t.getData('b');
+            ty.bomb = Boolean.parseBoolean(t.getData('e'));
+            ty.fire = Boolean.parseBoolean(t.getData('f'));
+            ty.monsters = t.getData('m');
             val.add(ty);
         }
         try {
@@ -265,6 +282,15 @@ public class Town extends OwnedLand {
         bans = new ArrayList<ZonePlayer>();
         plots = new ArrayList<Plot>();
         flags = new FlagSet();
+    }
+    public void putFlags(String animals, String monsters, String blocks, boolean fire, boolean bomb) {
+        flags.loadStarts(animals, monsters, blocks, fire, bomb);
+    }
+    public boolean isBlocked(Object o) {
+        return flags.isBlocked(o);
+    }
+    public String getData(char flag) {
+        return flags.getData(flag);
     }
     public void addPlot(Plot p) {
         plots.add(p);

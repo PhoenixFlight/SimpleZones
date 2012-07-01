@@ -10,6 +10,27 @@ import org.bukkit.entity.EntityType;
  * @author Phoenix
  */
 public class MonsterFlag implements Flag {
+    public static enum MobIDs {
+        mob1(EntityType.CAVE_SPIDER),
+        mob2(EntityType.CREEPER),
+        mob3(EntityType.ENDER_DRAGON),
+        mob4(EntityType.ENDERMAN),
+        mob5(EntityType.GHAST),
+        mob6(EntityType.GIANT),
+        mob7(EntityType.MAGMA_CUBE),
+        mob8(EntityType.PIG_ZOMBIE),
+        mob9(EntityType.SILVERFISH),
+        mob10(EntityType.SKELETON),
+        mob11(EntityType.SLIME),
+        mob12(EntityType.SPIDER),
+        mob13(EntityType.SQUID),
+        mob14(EntityType.ZOMBIE),
+        mob15(EntityType.BLAZE);
+        public EntityType type;
+        MobIDs(EntityType type) {
+            this.type = type;
+        }
+    }
     private HashMap<EntityType, Boolean> blockMap;
 
     public MonsterFlag() {
@@ -19,6 +40,7 @@ public class MonsterFlag implements Flag {
 
     public void loadDefaults() {
         FileConfiguration fc = SimpleZones.getPlugConfig();
+        blockMap.put(EntityType.BLAZE, fc.getBoolean("default-flags.monsters.blaze"));
         blockMap.put(EntityType.CAVE_SPIDER, fc.getBoolean("default-flags.monsters.cave_spider"));
         blockMap.put(EntityType.CREEPER, fc.getBoolean("default-flags.monsters.creeper"));
         blockMap.put(EntityType.ENDER_DRAGON, fc.getBoolean("default-flags.monsters.ender_dragon"));

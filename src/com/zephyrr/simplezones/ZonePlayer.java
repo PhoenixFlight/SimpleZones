@@ -311,6 +311,7 @@ public class ZonePlayer {
             showFlagList();
         } else {
             town.setFlag(args[1]);
+            player.sendMessage(ChatColor.GOLD + "[SimpleZones] Flag request has been processed.");
         }
         return true;
     }

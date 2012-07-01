@@ -1,5 +1,9 @@
 package com.zephyrr.simplezones;
 
+import com.zephyrr.simplezones.flags.AnimalFlag;
+import com.zephyrr.simplezones.flags.AnimalFlag.AniIDs;
+import com.zephyrr.simplezones.flags.MonsterFlag;
+import com.zephyrr.simplezones.flags.MonsterFlag.MobIDs;
 import java.io.File;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -9,6 +13,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import sqlibrary.*;
 import com.zephyrr.simplezones.listeners.*;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -20,6 +26,7 @@ public class SimpleZones extends JavaPlugin {
 
     private static JavaPlugin plug;
     private static double VERSION = 0.5;
+
     public static Player getPlayer(String name) {
         return plug.getServer().getPlayer(name);
     }
@@ -56,8 +63,9 @@ public class SimpleZones extends JavaPlugin {
             firstRun();
         }
 
-        if(getConfig().getDouble("version") != VERSION)
+        if (!getConfig().contains("version") || getConfig().getDouble("version") != VERSION) {
             updateResources();
+        }
 
         Town.fill(db, prefix);
         Plot.fill(db, prefix);
@@ -79,8 +87,19 @@ public class SimpleZones extends JavaPlugin {
     }
 
     private void updateResources() {
-        
         saveDefaultConfig();
+        if (db == null) {
+            return;
+        }
+        try {
+            db.getConnection().prepareCall("AddColumnUnlessExists('" + getConfig().getString("database.mysql.database") + "', " + prefix + "'towns', 'Animals', 'text'").execute();
+            db.getConnection().prepareCall("AddColumnUnlessExists('" + getConfig().getString("database.mysql.database") + "', " + prefix + "'towns', 'Monsters', 'text'").execute();
+            db.getConnection().prepareCall("AddColumnUnlessExists('" + getConfig().getString("database.mysql.database") + "', " + prefix + "'towns', 'Blocks', 'text'").execute();
+            db.getConnection().prepareCall("AddColumnUnlessExists('" + getConfig().getString("database.mysql.database") + "', " + prefix + "'towns', 'Fire', 'boolean'").execute();
+            db.getConnection().prepareCall("AddColumnUnlessExists('" + getConfig().getString("database.mysql.database") + "', " + prefix + "'towns', 'Bomb', 'boolean'").execute();
+        } catch(SQLException ex) {
+            ex.printStackTrace();
+        }
     }
 
     private void firstRun() {
@@ -144,6 +163,43 @@ public class SimpleZones extends JavaPlugin {
                     + "PRIMARY KEY (M_Id)"
                     + ")");
         }
+        try {
+            if(!db.query("SELECT * FROM `information_schema`.`ROUTINES` where specific_name = 'AddColumnUnlessExists'").next())
+                return;
+        } catch(SQLException ex) {
+            ex.printStackTrace();
+        }
+        //-- Copyright (c) 2009 www.cryer.co.uk
+        //-- Script is free to use provided this copyright header is included.
+        String proc = "";
+        proc += "drop procedure if exists AddColumnUnlessExists;\n";
+        proc += "delimiter '//'/n";
+        proc += "create procedure AddColumnUnlessExists(\n";
+        proc += "   IN dbName tinytext,\n";
+        proc += "	IN tableName tinytext,\n";
+        proc += "	IN fieldName tinytext,\n";
+        proc += "	IN fieldDef text)\n";
+        proc += "begin\n";
+        proc += "	IF NOT EXISTS (\n";
+        proc += "		SELECT * FROM information_schema.COLUMNS\n";
+        proc += "		WHERE column_name=fieldName\n";
+        proc += "		and table_name=tableName\n";
+        proc += "		and table_schema=dbName\n";
+        proc += "		)\n";
+        proc += "	THEN\n";
+        proc += "		set @ddl=CONCAT('ALTER TABLE ',dbName,'.',tableName,\n";
+        proc += "			' ADD COLUMN ',fieldName,' ',fieldDef);\n";
+        proc += "		prepare stmt from @ddl;\n";
+        proc += "		execute stmt;\n";
+        proc += "	END IF;\n";
+        proc += "end;\n";
+        proc += "delimiter ';'\n";
+        Statement state = db.prepare(proc);
+        try {
+            state.executeUpdate(proc);
+        } catch(SQLException ex) {
+            ex.printStackTrace();
+        }
     }
 
     @Override
@@ -179,14 +235,22 @@ public class SimpleZones extends JavaPlugin {
                     return zoneSender.plotDelete();
                 }
                 return false;
-            } else if(args[0].equalsIgnoreCase("flag") && sender.hasPermission("Zone.flag")) {
+            } else if (args[0].equalsIgnoreCase("flag") && sender.hasPermission("Zone.flag")) {
                 return zoneSender.flag(args);
-            } else if(args[0].equalsIgnoreCase("massmail") && sender.hasPermission("Zone.massmail")) {
-                if(args.length == 1)
+            } else if(args[0].equalsIgnoreCase("aIdList") && sender.hasPermission("Zone.flag")) {
+                showAIDs(sender);
+                return true;
+            } else if(args[0].equalsIgnoreCase("mIdList") && sender.hasPermission("Zone.flag")) {
+                showMIDs(sender);
+                return true;
+            } else if (args[0].equalsIgnoreCase("massmail") && sender.hasPermission("Zone.massmail")) {
+                if (args.length == 1) {
                     return false;
+                }
                 String msg = "";
-                for(int i = 1; i < args.length; i++)
+                for (int i = 1; i < args.length; i++) {
                     msg += args[i];
+                }
                 return zoneSender.massmail(msg);
             } else if (args[0].equalsIgnoreCase("define") && sender.hasPermission("Zone.define")) {
                 return zoneSender.define();
@@ -290,12 +354,12 @@ public class SimpleZones extends JavaPlugin {
                 }
                 return true;
             }
-        } else if(command.getName().equalsIgnoreCase("zchat")) {
-            if(args[0].equalsIgnoreCase("toggle") && send.hasPermission("Zchat.toggle")) {
+        } else if (command.getName().equalsIgnoreCase("zchat")) {
+            if (args[0].equalsIgnoreCase("toggle") && send.hasPermission("Zchat.toggle")) {
                 zoneSender.toggleChannel();
                 send.sendMessage(ChatColor.GOLD + "[SimpleZones] Your active chat channel has been set to " + zoneSender.getChannel().name().toLowerCase());
                 return true;
-            } else if(args[0].equalsIgnoreCase("help") && send.hasPermission("Zchat.help")) {
+            } else if (args[0].equalsIgnoreCase("help") && send.hasPermission("Zchat.help")) {
                 showChatHelp(send);
             }
         }
@@ -331,12 +395,13 @@ public class SimpleZones extends JavaPlugin {
 
     private void showChatHelp(Player p) {
         ArrayList<String> al = new ArrayList<String>();
-        if(p.hasPermission("Zchat.toggle")) {
+        if (p.hasPermission("Zchat.toggle")) {
             al.add(ChatColor.GREEN + "/zchat toggle");
             al.add(ChatColor.GOLD + "Toggles your active chat channel between town and global.");
         }
-        for(String s : al)
+        for (String s : al) {
             p.sendMessage(s);
+        }
     }
 
     private void showTownHelp(Player p, String[] args) {
@@ -392,7 +457,7 @@ public class SimpleZones extends JavaPlugin {
             al.add(ChatColor.GREEN + "/zone plot create");
             al.add(ChatColor.GOLD + "Creates a plot from the given selection.");
         }
-        if(p.hasPermission("Zone.plot.delete")) {
+        if (p.hasPermission("Zone.plot.delete")) {
             al.add(ChatColor.GREEN + "/zone plot delete");
             al.add(ChatColor.GOLD + "Deletes the plot in which you are currently standing.");
         }
@@ -425,8 +490,9 @@ public class SimpleZones extends JavaPlugin {
             al.add(ChatColor.GOLD + "Leaves the current town.");
         }
         page--;
-        for (int i = page * 12; i < 12 + (page * 12) && i < al.size(); i++) 
+        for (int i = page * 12; i < 12 + (page * 12) && i < al.size(); i++) {
             p.sendMessage(al.get(i));
+        }
         p.sendMessage(ChatColor.GOLD + "====== Page " + (page + 1) + " of " + (al.size() / 12 + 1) + " ======");
     }
 
@@ -448,6 +514,18 @@ public class SimpleZones extends JavaPlugin {
             p.sendMessage(s);
         }
         p.sendMessage(ChatColor.GOLD + "====== Page 1 of 1 ======");
+    }
+
+    private void showAIDs(CommandSender sender) {
+        sender.sendMessage(ChatColor.GOLD + "[SimpleZones] Animal Flag IDs");
+        for(AniIDs aid : AnimalFlag.AniIDs.values())
+            sender.sendMessage(ChatColor.GOLD + aid.type.getName() + ": " + aid.name().substring(3));
+    }
+
+    private void showMIDs(CommandSender sender) {
+        sender.sendMessage(ChatColor.GOLD + "[SimpleZones] Animal Flag IDs");
+        for(MobIDs aid : MonsterFlag.MobIDs.values())
+            sender.sendMessage(ChatColor.GOLD + aid.type.getName() + ": " + aid.name().substring(3));
     }
 
     public void onDisable() {

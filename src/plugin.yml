@@ -21,11 +21,14 @@ permissions:
       Zone.join: true
       Zone.leave: true
       Zone.massmail: true
+      Zone.flag: true
       Zone.help: true
   Zone.massmail:
     description: Allows town owners to send mass mails to their entire town.
   Zone.define:
     description: Allows users to define boundaries for new Towns.
+  Zone.flag:
+    description: Allows users to set flags for their town.
   Zone.create:
     description: Allows users to create new Towns using preset boundaries.
     children:

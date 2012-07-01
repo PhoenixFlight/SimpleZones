@@ -1,6 +1,7 @@
 version: 0.5
 default-flags:
   monsters:
+    blaze: true
     cave_spider: true
     creeper: true
     ender_dragon: true
@@ -15,6 +16,24 @@ default-flags:
     spider: true
     squid: true
     zombie: true
+  animals:
+    chicken: false
+    cow: false
+    irongolem: true
+    mooshroom: false
+    pig: false
+    sheep: false
+    snowman: true
+    villager: true
+    wolf: false
+  blocks:
+    simple-default: 10,11,51
+    final: 46,52
+    unblockable: 0,26,90
+  fire:
+    burn: true
+  explode:
+    blocked: true
 database:
   type: yml
   prefix: SZ_

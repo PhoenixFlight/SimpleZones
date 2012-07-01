@@ -1,6 +1,8 @@
 package com.zephyrr.simplezones.listeners;
 
 import com.zephyrr.simplezones.OwnedLand;
+import com.zephyrr.simplezones.Plot;
+import com.zephyrr.simplezones.Town;
 import com.zephyrr.simplezones.ZonePlayer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -40,7 +42,13 @@ public class BlockListener implements Listener {
         OwnedLand owned = OwnedLand.getLandAtPoint(event.getBlock().getLocation());
         if(owned == null)
             return;
-        if(!owned.canBuild(event.getPlayer()))
+        if(!owned.canBuild(event.getPlayer())) {
+            event.setCancelled(true);
+            return;
+        }
+        if(owned instanceof Plot)
+            owned = ((Plot)owned).getTown();
+        if(((Town)owned).isBlocked(event.getBlock().getType()))
             event.setCancelled(true);
     }
 }
