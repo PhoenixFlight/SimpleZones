@@ -16,6 +16,7 @@ import com.zephyrr.simplezones.listeners.*;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.logging.Logger;
 import org.bukkit.configuration.file.FileConfiguration;
 
 /**
@@ -62,9 +63,13 @@ public class SimpleZones extends JavaPlugin {
             db.open();
             firstRun();
         }
+        updateResources();
 
         if (!getConfig().contains("version") || getConfig().getDouble("version") != VERSION) {
-            updateResources();
+            if (new File("plugins/SimpleZones/config.yml").exists()) {
+                new File("plugins/SimpleZones/config.yml").delete();
+            }
+            saveDefaultConfig();
         }
 
         Town.fill(db, prefix);
@@ -89,21 +94,14 @@ public class SimpleZones extends JavaPlugin {
     }
 
     private void updateResources() {
-        if(new File("plugins/SimpleZones/config.yml").exists())
-            new File("plugins/SimpleZones/config.yml").delete();
-        saveDefaultConfig();
         if (db == null) {
             return;
         }
-        try {
-            db.getConnection().prepareCall("AddColumnUnlessExists('" + getConfig().getString("database.mysql.database") + "', " + prefix + "'towns', 'Animals', 'text'").execute();
-            db.getConnection().prepareCall("AddColumnUnlessExists('" + getConfig().getString("database.mysql.database") + "', " + prefix + "'towns', 'Monsters', 'text'").execute();
-            db.getConnection().prepareCall("AddColumnUnlessExists('" + getConfig().getString("database.mysql.database") + "', " + prefix + "'towns', 'Blocks', 'text'").execute();
-            db.getConnection().prepareCall("AddColumnUnlessExists('" + getConfig().getString("database.mysql.database") + "', " + prefix + "'towns', 'Fire', 'boolean'").execute();
-            db.getConnection().prepareCall("AddColumnUnlessExists('" + getConfig().getString("database.mysql.database") + "', " + prefix + "'towns', 'Bomb', 'boolean'").execute();
-        } catch(SQLException ex) {
-            ex.printStackTrace();
-        }
+        addColumnUnlessExists(prefix + "towns", "Animals", "text");
+        addColumnUnlessExists(prefix + "towns", "Monsters", "text");
+        addColumnUnlessExists(prefix + "towns", "Blocks", "text");
+        addColumnUnlessExists(prefix + "towns", "Fire", "boolean");
+        addColumnUnlessExists(prefix + "towns", "Bomb", "boolean");
     }
 
     private void firstRun() {
@@ -168,39 +166,20 @@ public class SimpleZones extends JavaPlugin {
                     + ")");
         }
         try {
-            if(!db.query("SELECT * FROM `information_schema`.`ROUTINES` where specific_name = 'AddColumnUnlessExists'").next())
+            if (db.query("SELECT * FROM `information_schema`.`ROUTINES` where specific_name = 'AddColumnUnlessExists'").next()) {
                 return;
-        } catch(SQLException ex) {
+            }
+        } catch (SQLException ex) {
             ex.printStackTrace();
         }
-        //-- Copyright (c) 2009 www.cryer.co.uk
-        //-- Script is free to use provided this copyright header is included.
-        String proc = "";
-        proc += "drop procedure if exists AddColumnUnlessExists;\n";
-        proc += "delimiter '//'/n";
-        proc += "create procedure AddColumnUnlessExists(\n";
-        proc += "   IN dbName tinytext,\n";
-        proc += "	IN tableName tinytext,\n";
-        proc += "	IN fieldName tinytext,\n";
-        proc += "	IN fieldDef text)\n";
-        proc += "begin\n";
-        proc += "	IF NOT EXISTS (\n";
-        proc += "		SELECT * FROM information_schema.COLUMNS\n";
-        proc += "		WHERE column_name=fieldName\n";
-        proc += "		and table_name=tableName\n";
-        proc += "		and table_schema=dbName\n";
-        proc += "		)\n";
-        proc += "	THEN\n";
-        proc += "		set @ddl=CONCAT('ALTER TABLE ',dbName,'.',tableName,\n";
-        proc += "			' ADD COLUMN ',fieldName,' ',fieldDef);\n";
-        proc += "		prepare stmt from @ddl;\n";
-        proc += "		execute stmt;\n";
-        proc += "	END IF;\n";
-        proc += "end;\n";
-        proc += "delimiter ';'\n";
-        Statement state = db.prepare(proc);
+    }
+
+    private void addColumnUnlessExists(String table, String column, String data) {
         try {
-            state.executeUpdate(proc);
+            String query = "SELECT * FROM information_schema.COLUMNS where column_name='" + column + "' and table_name='" + table + "' and table_schema='" + getConfig().getString("database.mysql.database") + "'";
+            if(db.query(query).next())
+                return;
+            db.query("ALTER TABLE " + table + " ADD COLUMN " + column + " " + data);
         } catch(SQLException ex) {
             ex.printStackTrace();
         }
@@ -241,10 +220,10 @@ public class SimpleZones extends JavaPlugin {
                 return false;
             } else if (args[0].equalsIgnoreCase("flag") && sender.hasPermission("Zone.flag")) {
                 return zoneSender.flag(args);
-            } else if(args[0].equalsIgnoreCase("aIdList") && sender.hasPermission("Zone.flag")) {
+            } else if (args[0].equalsIgnoreCase("aIdList") && sender.hasPermission("Zone.flag")) {
                 showAIDs(sender);
                 return true;
-            } else if(args[0].equalsIgnoreCase("mIdList") && sender.hasPermission("Zone.flag")) {
+            } else if (args[0].equalsIgnoreCase("mIdList") && sender.hasPermission("Zone.flag")) {
                 showMIDs(sender);
                 return true;
             } else if (args[0].equalsIgnoreCase("massmail") && sender.hasPermission("Zone.massmail")) {
@@ -522,14 +501,16 @@ public class SimpleZones extends JavaPlugin {
 
     private void showAIDs(CommandSender sender) {
         sender.sendMessage(ChatColor.GOLD + "[SimpleZones] Animal Flag IDs");
-        for(AniIDs aid : AnimalFlag.AniIDs.values())
+        for (AniIDs aid : AnimalFlag.AniIDs.values()) {
             sender.sendMessage(ChatColor.GOLD + aid.type.getName() + ": " + aid.name().substring(3));
+        }
     }
 
     private void showMIDs(CommandSender sender) {
         sender.sendMessage(ChatColor.GOLD + "[SimpleZones] Monster Flag IDs");
-        for(MobIDs aid : MonsterFlag.MobIDs.values())
+        for (MobIDs aid : MonsterFlag.MobIDs.values()) {
             sender.sendMessage(ChatColor.GOLD + aid.type.getName() + ": " + aid.name().substring(3));
+        }
     }
 
     public void onDisable() {

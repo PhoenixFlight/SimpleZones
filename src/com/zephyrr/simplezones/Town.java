@@ -119,8 +119,8 @@ public class Town extends OwnedLand {
                     + "'" + t.getData('a') + "',"
                     + "'" + t.getData('m') + "',"
                     + "'" + t.getData('b') + "',"
-                    + "'" + t.getData('f') + "',"
-                    + "'" + t.getData('e') + "'"
+                    + "" + t.getData('f') + ","
+                    + "" + t.getData('e') + ""
                     + ")";
             db.query(query);
         }

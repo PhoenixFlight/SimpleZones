@@ -85,7 +85,7 @@ public class BlockFlag implements Flag {
         if(blockedBlocks.containsKey(mat) && blockedBlocks.get(mat))
             return;
         if(tf)
-            blockedBlocks.put(mat, tf);
+            blockedBlocks.put(mat, false);
         else blockedBlocks.remove(mat);
     }
 

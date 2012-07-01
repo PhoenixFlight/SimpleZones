@@ -1,6 +1,6 @@
 name: SimpleZones
 main: com.zephyrr.simplezones.SimpleZones
-version: 0.4
+version: 0.5
 author: PhoenixFlight
 permissions:
   Zone.*:
