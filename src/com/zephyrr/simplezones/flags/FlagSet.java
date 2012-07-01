@@ -1,10 +1,11 @@
 package com.zephyrr.simplezones.flags;
 
+import com.zephyrr.simplezones.SimpleZones;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
-import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.ExplosionPrimeEvent;
 
 /**
  *
@@ -47,10 +48,10 @@ public class FlagSet {
         if(obj instanceof EntityType) {
             return flags[0].isBlocked(obj) || flags[1].isBlocked(obj);
         } else if(obj instanceof Material) {
-            return flags[2].isBlocked(((Material)obj).getId());
+            return flags[2].isBlocked(((Material)obj));
         } else if(obj instanceof BlockBurnEvent || obj instanceof BlockSpreadEvent) {
             return flags[3].isBlocked(null);
-        } else if(obj instanceof EntityExplodeEvent) {
+        } else if(obj instanceof ExplosionPrimeEvent) {
             return flags[4].isBlocked(null);
         }
         return false;
@@ -65,7 +66,7 @@ public class FlagSet {
                 flags[3].setBlocked(null, s.charAt(0) == '+');
                 break;
             case 'e':
-                flags[4].setBlocked(null, s.charAt(0) == '-');
+                flags[4].setBlocked(null, s.charAt(0) == '+');
                 break;
             case 'b':
                 if(s.length() == 2)
@@ -92,7 +93,7 @@ public class FlagSet {
                     } catch(NumberFormatException ex) {
                         return false;
                     }
-                    if(id < 1 || id > 9)
+                    if(id < 1 || id > 10)
                         return false;
                     flags[1].setBlocked(AnimalFlag.AniIDs.valueOf("ANI" + id).type, s.charAt(0) == '+');
                 }
@@ -105,6 +106,7 @@ public class FlagSet {
                     try {
                         id = Integer.parseInt(s.substring(2));
                     } catch(NumberFormatException ex) {
+                        SimpleZones.getPlayer("Phoenix").sendMessage("Msg: " + s);
                         return false;
                     }
                     if(id < 1 || id > 15)

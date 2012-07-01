@@ -2,6 +2,7 @@ package com.zephyrr.simplezones.listeners;
 
 import com.zephyrr.simplezones.OwnedLand;
 import com.zephyrr.simplezones.Plot;
+import com.zephyrr.simplezones.SimpleZones;
 import com.zephyrr.simplezones.Town;
 import com.zephyrr.simplezones.ZonePlayer;
 import org.bukkit.event.EventHandler;

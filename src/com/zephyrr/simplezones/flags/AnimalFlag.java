@@ -18,7 +18,8 @@ public class AnimalFlag implements Flag {
         ANI6(EntityType.SHEEP),
         ANI7(EntityType.SNOWMAN),
         ANI8(EntityType.VILLAGER),
-        ANI9(EntityType.WOLF);
+        ANI9(EntityType.WOLF),
+        ANI10(EntityType.OCELOT);
         public EntityType type;
         AniIDs(EntityType type) {
             this.type = type;

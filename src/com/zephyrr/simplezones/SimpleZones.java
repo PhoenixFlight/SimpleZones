@@ -84,9 +84,13 @@ public class SimpleZones extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new BlockListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerListener(), this);
+        getServer().getPluginManager().registerEvents(new DestructoListener(), this);
+        getServer().getPluginManager().registerEvents(new MonsterListener(), this);
     }
 
     private void updateResources() {
+        if(new File("plugins/SimpleZones/config.yml").exists())
+            new File("plugins/SimpleZones/config.yml").delete();
         saveDefaultConfig();
         if (db == null) {
             return;
@@ -523,7 +527,7 @@ public class SimpleZones extends JavaPlugin {
     }
 
     private void showMIDs(CommandSender sender) {
-        sender.sendMessage(ChatColor.GOLD + "[SimpleZones] Animal Flag IDs");
+        sender.sendMessage(ChatColor.GOLD + "[SimpleZones] Monster Flag IDs");
         for(MobIDs aid : MonsterFlag.MobIDs.values())
             sender.sendMessage(ChatColor.GOLD + aid.type.getName() + ": " + aid.name().substring(3));
     }

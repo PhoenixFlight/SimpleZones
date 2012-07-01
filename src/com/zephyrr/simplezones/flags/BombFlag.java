@@ -5,7 +5,7 @@ import com.zephyrr.simplezones.SimpleZones;
 public class BombFlag implements Flag {
     private boolean blocked;
     public BombFlag() {
-
+        loadDefaults();
     }
 
     public void loadDefaults() {

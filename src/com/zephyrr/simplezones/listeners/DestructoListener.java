@@ -20,6 +20,8 @@ public class DestructoListener implements Listener {
         if(event.getSource().getType() != Material.FIRE)
             return;
         OwnedLand owned = OwnedLand.getLandAtPoint(event.getSource().getLocation());
+        if(owned == null)
+            return;
         if(owned instanceof Plot)
             owned = ((Plot)owned).getTown();
         if(((Town)owned).isBlocked(event))
@@ -28,6 +30,8 @@ public class DestructoListener implements Listener {
     @EventHandler
     public void onBurn(BlockBurnEvent event) {
         OwnedLand owned = OwnedLand.getLandAtPoint(event.getBlock().getLocation());
+        if(owned == null)
+            return;
         if(owned instanceof Plot)
             owned = ((Plot)owned).getTown();
         if(((Town)owned).isBlocked(event))
@@ -36,9 +40,12 @@ public class DestructoListener implements Listener {
     @EventHandler
     public void onBoom(ExplosionPrimeEvent event) {
         OwnedLand owned = OwnedLand.getLandAtPoint(event.getEntity().getLocation());
+        if(owned == null)
+            return;
         if(owned instanceof Plot)
             owned = ((Plot)owned).getTown();
         if(((Town)owned).isBlocked(event))
             event.setRadius(0.0f);
+        
     }
 }

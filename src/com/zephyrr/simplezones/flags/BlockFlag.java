@@ -79,10 +79,7 @@ public class BlockFlag implements Flag {
     }
 
     public void setBlocked(Object obj, boolean tf) {
-        if(!(obj instanceof Integer))
-            return;
-        int id = (Integer)obj;
-        Material mat = Material.getMaterial(id);
+        Material mat = Material.getMaterial((Integer)obj);
         if(unblockable.contains(mat))
             return;
         if(blockedBlocks.containsKey(mat) && blockedBlocks.get(mat))
