@@ -20,10 +20,15 @@ public class BlockListener implements Listener {
     public void onBlockBreak(BlockBreakEvent event) {
         if(ZonePlayer.findUser(event.getPlayer()).isDefining()) {
             ZonePlayer.findUser(event.getPlayer()).setCorner(event.getBlock().getLocation());
+            event.setCancelled(true);
+            return;
         }
         OwnedLand owned = OwnedLand.getLandAtPoint(event.getBlock().getLocation());
-        if(owned == null)
+        if(owned == null) {
+        	if(!SimpleZones.getPlugConfig().getBoolean("wild.break"))
+        		event.setCancelled(true);
             return;
+        }
         if(!owned.canBuild(event.getPlayer()))
             event.setCancelled(true);
     }
@@ -31,6 +36,8 @@ public class BlockListener implements Listener {
     public void onBlockDamage(BlockDamageEvent event) {
         if(ZonePlayer.findUser(event.getPlayer()).isDefining()) {
             ZonePlayer.findUser(event.getPlayer()).setCorner(event.getBlock().getLocation());
+            event.setCancelled(true);
+            return;
         }
         OwnedLand owned = OwnedLand.getLandAtPoint(event.getBlock().getLocation());
         if(owned == null)
@@ -41,8 +48,11 @@ public class BlockListener implements Listener {
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
         OwnedLand owned = OwnedLand.getLandAtPoint(event.getBlock().getLocation());
-        if(owned == null)
+        if(owned == null) {
+        	if(!SimpleZones.getPlugConfig().getBoolean("wild.build"))
+        		event.setCancelled(true);
             return;
+        }
         if(!owned.canBuild(event.getPlayer())) {
             event.setCancelled(true);
             return;

@@ -17,8 +17,7 @@ import com.zephyrr.simplezones.ymlIO.PlayerYml;
 import java.io.FileWriter;
 import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
 
-/**
- *
+/*
  * @author Phoenix
  */
 public class ZonePlayer {

@@ -1,4 +1,7 @@
 version: 0.5
+wild:
+  build: false
+  break: true
 default-flags:
   monsters:
     blaze: true
