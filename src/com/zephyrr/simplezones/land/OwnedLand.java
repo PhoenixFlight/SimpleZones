@@ -1,4 +1,4 @@
-package com.zephyrr.simplezones;
+package com.zephyrr.simplezones.land;
 
 import java.util.ArrayList;
 import java.util.HashMap;

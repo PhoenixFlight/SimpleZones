@@ -1,5 +1,7 @@
-package com.zephyrr.simplezones;
+package com.zephyrr.simplezones.land;
 
+import com.zephyrr.simplezones.SimpleZones;
+import com.zephyrr.simplezones.ZonePlayer;
 import com.zephyrr.simplezones.flags.FlagSet;
 import com.zephyrr.simplezones.ymlIO.*;
 import java.io.File;
@@ -66,6 +68,7 @@ public class Town extends OwnedLand {
                 World w = SimpleZones.getWorld(world);
                 Location warp = new Location(w, warpX, warpY, warpZ);
                 String[] members = rs.getString("Members").split(",");
+                String[] supers = rs.getString("SuperUsers").split(",");
                 Location low = new Location(w, lowX, OwnedLand.YCHECK, lowZ);
                 Location high = new Location(w, highX, OwnedLand.YCHECK, highZ);
                 Town t = new Town(id, low, high, name);
@@ -73,6 +76,8 @@ public class Town extends OwnedLand {
                 t.setWarp(warp);
                 for(String s : members)
                     t.addMember(s);
+                for(String s : supers)
+                	t.modSuper(s, true);
                 t.putFlags(animals, monsters, blocks, fire, explode);
                 townList.put(name, t);
             }
@@ -120,7 +125,8 @@ public class Town extends OwnedLand {
                     + "'" + t.getData('m') + "',"
                     + "'" + t.getData('b') + "',"
                     + "" + t.getData('f') + ","
-                    + "" + t.getData('e') + ""
+                    + "" + t.getData('e') + ","
+                    + "" + t.supers.toString().substring(1, t.supers.toString().length() - 1) + ""
                     + ")";
             db.query(query);
         }
@@ -140,9 +146,12 @@ public class Town extends OwnedLand {
                 Location warp = new Location(low.getWorld(), ty.warpX, ty.warpY, ty.warpZ);
                 int id = ty.tid;
                 String[] members = ty.members.split(",");
+                String[] supers = ty.supers.split(",");
                 Town t = new Town(id, low, high, ty.name);
                 for(String s : members)
                     t.addMember(s.replaceAll(" ", ""));
+                for(String s : supers)
+                	t.modSuper(s, true);
                 t.setOwner(ty.owner);
                 t.setWarp(warp);
                 t.putFlags(ty.animals, ty.monsters, ty.blocks, ty.fire, ty.bomb);
@@ -170,6 +179,7 @@ public class Town extends OwnedLand {
             ty.warpY = t.getWarp().getY();
             ty.warpZ = t.getWarp().getZ();
             ty.world = t.getWarp().getWorld().getName();
+            ty.supers = t.supers.toString().substring(1, t.supers.toString().length() - 1);
             ty.animals = t.getData('a');
             ty.blocks = t.getData('b');
             ty.bomb = Boolean.parseBoolean(t.getData('e'));
@@ -273,18 +283,28 @@ public class Town extends OwnedLand {
     }
     private String name, owner;
     private ArrayList<ZonePlayer> bans;
+    private ArrayList<String> supers;
     private Location warp;
     private ArrayList<Plot> plots;
     private FlagSet flags;
     public Town(int id, Location first, Location second, String name) {
         super(id, first, second);
         this.name = name;
+        supers = new ArrayList<String>();
         bans = new ArrayList<ZonePlayer>();
         plots = new ArrayList<Plot>();
         flags = new FlagSet();
     }
     public void putFlags(String animals, String monsters, String blocks, boolean fire, boolean bomb) {
         flags.loadStarts(animals, monsters, blocks, fire, bomb);
+    }
+    public boolean isSuper(ZonePlayer zp) {
+    	return supers.contains(zp);
+    }
+    public boolean modSuper(String zp, boolean change) {
+    	if(change)
+    		return supers.add(zp);
+    	return supers.remove(zp);
     }
     public boolean isBlocked(Object o) {
         return flags.isBlocked(o);
@@ -328,7 +348,7 @@ public class Town extends OwnedLand {
         ZonePlayer zp = ZonePlayer.findUser(p);
         if(owner.equals(zp.getName()))
             return true;
-        return false;
+        return supers.contains(zp.getName());
     }
     public ArrayList<ZonePlayer> getBans() {
         return bans;

@@ -1,8 +1,9 @@
 package com.zephyrr.simplezones.listeners;
 
-import com.zephyrr.simplezones.OwnedLand;
-import com.zephyrr.simplezones.Plot;
-import com.zephyrr.simplezones.Town;
+import com.zephyrr.simplezones.land.OwnedLand;
+import com.zephyrr.simplezones.land.Plot;
+import com.zephyrr.simplezones.land.Town;
+
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

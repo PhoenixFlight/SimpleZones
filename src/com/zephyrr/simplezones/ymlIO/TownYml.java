@@ -13,6 +13,7 @@ public class TownYml {
     public double warpX, warpY, warpZ;
     public String world;
     public String members;
+    public String supers;
     
     // Area protection flags
     public boolean bomb;

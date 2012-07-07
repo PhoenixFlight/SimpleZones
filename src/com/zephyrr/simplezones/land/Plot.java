@@ -1,4 +1,4 @@
-package com.zephyrr.simplezones;
+package com.zephyrr.simplezones.land;
 
 import java.io.IOException;
 import java.sql.ResultSet;
@@ -7,6 +7,8 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.yaml.snakeyaml.Yaml;
 import sqlibrary.Database;
+
+import com.zephyrr.simplezones.ZonePlayer;
 import com.zephyrr.simplezones.ymlIO.PlotYml;
 import java.io.File;
 import java.io.FileInputStream;

@@ -12,11 +12,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import sqlibrary.*;
+
+import com.zephyrr.simplezones.land.Plot;
+import com.zephyrr.simplezones.land.Town;
 import com.zephyrr.simplezones.listeners.*;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.logging.Logger;
 import org.bukkit.configuration.file.FileConfiguration;
 
 /**
@@ -26,7 +27,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 public class SimpleZones extends JavaPlugin {
 
     private static JavaPlugin plug;
-    private static double VERSION = 0.5;
+    private static double VERSION = 0.6;
 
     public static Player getPlayer(String name) {
         return plug.getServer().getPlayer(name);
@@ -102,9 +103,22 @@ public class SimpleZones extends JavaPlugin {
         addColumnUnlessExists(prefix + "towns", "Blocks", "text");
         addColumnUnlessExists(prefix + "towns", "Fire", "boolean");
         addColumnUnlessExists(prefix + "towns", "Bomb", "boolean");
+        addColumnUnlessExists(prefix + "towns", "SuperUsers", "text");
     }
 
     private void firstRun() {
+    	if(!db.checkTable(prefix + "sanctuaries")) {
+    		db.createTable("CREATE TABLE " + prefix + "sanctuaries (" +
+    				"S_Id int NOT NULL," +
+    				"LowX int," +
+    				"HighX int," +
+    				"LowZ int," +
+    				"HighZ int," +
+    				"World text," +
+    				"PRIMARY KEY (S_Id)" +
+    				")");
+    	}
+    	
         if (!db.checkTable(prefix + "bans")) {
             db.createTable("CREATE TABLE " + prefix + "bans ("
                     + "P_Id int NOT NULL,"
@@ -371,6 +385,8 @@ public class SimpleZones extends JavaPlugin {
     private void warp(Player p, String s) {
         if (Town.getTown(s) == null) {
             p.sendMessage(ChatColor.RED + "[SimpleZones] " + s + " does not exist.");
+        } else if(Town.getTown(s).getBans().contains(ZonePlayer.findUser(p))) {
+        	p.sendMessage(ChatColor.RED + "[SimpleZones] You are banned from " + s);
         } else {
             p.teleport(Town.getTown(s).getWarp());
         }

@@ -1,11 +1,7 @@
 package com.zephyrr.simplezones.listeners;
 
-import com.zephyrr.simplezones.OwnedLand;
-import com.zephyrr.simplezones.Plot;
-import com.zephyrr.simplezones.Town;
 import com.zephyrr.simplezones.ZonePlayer;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -14,6 +10,10 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import com.zephyrr.simplezones.Channel;
+import com.zephyrr.simplezones.land.OwnedLand;
+import com.zephyrr.simplezones.land.Plot;
+import com.zephyrr.simplezones.land.Town;
+
 import java.util.HashSet;
 
 /**
@@ -56,7 +56,7 @@ public class PlayerListener implements Listener {
         if(event.getClickedBlock() == null)
             return;
         OwnedLand ol = OwnedLand.getLandAtPoint(event.getClickedBlock().getLocation());
-        if(ol == null || event.getClickedBlock().getType() != Material.CHEST)
+        if(ol == null)
             return;
         Town toCheck;
         if(ol instanceof Plot)
