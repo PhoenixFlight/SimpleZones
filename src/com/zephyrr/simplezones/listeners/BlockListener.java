@@ -4,6 +4,7 @@ import com.zephyrr.simplezones.SimpleZones;
 import com.zephyrr.simplezones.ZonePlayer;
 import com.zephyrr.simplezones.land.OwnedLand;
 import com.zephyrr.simplezones.land.Plot;
+import com.zephyrr.simplezones.land.Sanctuary;
 import com.zephyrr.simplezones.land.Town;
 
 import org.bukkit.event.EventHandler;
@@ -58,6 +59,8 @@ public class BlockListener implements Listener {
             event.setCancelled(true);
             return;
         }
+        if(owned instanceof Sanctuary)
+        	return;
         if(owned instanceof Plot)
             owned = ((Plot)owned).getTown();
         if(((Town)owned).isBlocked(event.getBlock().getType()))
