@@ -146,12 +146,15 @@ public class Town extends OwnedLand {
                 Location warp = new Location(low.getWorld(), ty.warpX, ty.warpY, ty.warpZ);
                 int id = ty.tid;
                 String[] members = ty.members.split(",");
-                String[] supers = ty.supers.split(",");
+                String[] supers = null;
+                if(ty.supers != null)
+                	supers = ty.supers.split(",");
                 Town t = new Town(id, low, high, ty.name);
                 for(String s : members)
                     t.addMember(s.replaceAll(" ", ""));
-                for(String s : supers)
-                	t.modSuper(s, true);
+                if(supers != null)
+                	for(String s : supers)
+                		t.modSuper(s, true);
                 t.setOwner(ty.owner);
                 t.setWarp(warp);
                 t.putFlags(ty.animals, ty.monsters, ty.blocks, ty.fire, ty.bomb);

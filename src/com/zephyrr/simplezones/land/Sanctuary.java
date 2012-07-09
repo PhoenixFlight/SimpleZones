@@ -25,6 +25,15 @@ public class Sanctuary extends OwnedLand {
 		sancts = new ArrayList<Sanctuary>();
 	}
 	
+	public static void modSancts(Sanctuary s) {
+		if(!sancts.remove(s))
+			sancts.add(s);
+	}
+	
+	public static ArrayList<Sanctuary> getSancts() {
+		return sancts;
+	}
+	
 	public static void fill(Database db, String prefix) {
 		if(db == null) {
 			fillYML();

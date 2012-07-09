@@ -240,7 +240,22 @@ public class SimpleZones extends JavaPlugin {
             } else if (args[0].equalsIgnoreCase("mIdList") && sender.hasPermission("Zone.flag")) {
                 showMIDs(sender);
                 return true;
-            } else if (args[0].equalsIgnoreCase("massmail") && sender.hasPermission("Zone.massmail")) {
+            } else if(args[0].equalsIgnoreCase("super") && sender.hasPermission("Zone.super")) {
+            	return args.length > 1 && zoneSender.superUser(args[1]);
+            } else if(args[0].equalsIgnoreCase("admin")) {
+            	if(args.length == 1)
+            		return false;
+            	if(args[1].equalsIgnoreCase("sanct")) {
+            		if(args.length == 2)
+            			return false;
+            		if(args[2].equalsIgnoreCase("create") && sender.hasPermission("Zone.admin.sanct.create")) {
+            			return zoneSender.makeSanct();
+            		} else if(args[2].equalsIgnoreCase("delete") && sender.hasPermission("Zone.admin.sanct.delete")) {
+            			return zoneSender.delSanct();
+            		}
+            	}
+            }
+            else if (args[0].equalsIgnoreCase("massmail") && sender.hasPermission("Zone.massmail")) {
                 if (args.length == 1) {
                     return false;
                 }
@@ -436,13 +451,13 @@ public class SimpleZones extends JavaPlugin {
             al.add(ChatColor.GREEN + "/zone ban <player>");
             al.add(ChatColor.GOLD + "Bans <player> from your town.  They are kicked, cannot ask to join, and cannot enter the town anymore.");
         }
-        if (p.hasPermission("Zone.delete")) {
-            al.add(ChatColor.GREEN + "/zone delete");
-            al.add(ChatColor.GOLD + "Permanently deletes your town.");
-        }
         if (p.hasPermission("Zone.unban")) {
             al.add(ChatColor.GREEN + "/zone unban <player>");
             al.add(ChatColor.GOLD + "Unbans <player> from your town.");
+        }
+        if (p.hasPermission("Zone.delete")) {
+            al.add(ChatColor.GREEN + "/zone delete");
+            al.add(ChatColor.GOLD + "Permanently deletes your town.");
         }
         if (p.hasPermission("Zone.setwarp")) {
             al.add(ChatColor.GREEN + "/zone setwarp");
@@ -487,6 +502,22 @@ public class SimpleZones extends JavaPlugin {
         if (p.hasPermission("Zone.leave")) {
             al.add(ChatColor.GREEN + "/zone leave");
             al.add(ChatColor.GOLD + "Leaves the current town.");
+        }
+        if(p.hasPermission("Zone.flag")) {
+        	al.add(ChatColor.GREEN + "/zone flag <flags>");
+        	al.add(ChatColor.GOLD + "Sets protection flags for your town.  Type " + ChatColor.GREEN + "/zone flag" + ChatColor.GOLD + " without any parameters to see information on specific flags.");
+        }
+        if(p.hasPermission("Zone.super")) {
+        	al.add(ChatColor.GREEN + "/zone super <player>");
+        	al.add(ChatColor.GOLD + "Toggle's the given user's Superuser status in your town.  Superusers can build in unplotted areas of the town.");
+        }
+        if(p.hasPermission("Zone.admin.sanct.create")) {
+        	al.add(ChatColor.GREEN + "/zone admin sanct create");
+        	al.add(ChatColor.GOLD + "Creates a Sanctuary where no towns can be formed using your most recent selection.");
+        }
+        if(p.hasPermission("Zone.admin.sanct.delete")) {
+        	al.add(ChatColor.GREEN + "/zone admin sanct delete");
+        	al.add(ChatColor.GOLD + "Deletes the Sanctuary in which you are standing.");
         }
         page--;
         for (int i = page * 12; i < 12 + (page * 12) && i < al.size(); i++) {

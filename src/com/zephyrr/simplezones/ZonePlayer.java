@@ -16,6 +16,7 @@ import sqlibrary.Database;
 
 import com.zephyrr.simplezones.land.OwnedLand;
 import com.zephyrr.simplezones.land.Plot;
+import com.zephyrr.simplezones.land.Sanctuary;
 import com.zephyrr.simplezones.land.Town;
 import com.zephyrr.simplezones.ymlIO.PlayerYml;
 import java.io.FileWriter;
@@ -295,13 +296,9 @@ public class ZonePlayer {
      * SIMPLEZONES COMMANDS
      ******************************************************************************/
     public boolean define() {
-        if (town != null) {
-            player.sendMessage(ChatColor.RED + "[SimpleZones] You can only be in one town at a time.");
-        } else {
-            corner1 = null;
-            corner2 = null;
-            player.sendMessage(ChatColor.GOLD + "Strike the first corner of your new town.");
-        }
+        corner1 = null;
+        corner2 = null;
+        player.sendMessage(ChatColor.GOLD + "Strike the first corner of your new area.");
         return true;
     }
 
@@ -601,5 +598,46 @@ public class ZonePlayer {
             }
         }
         return true;
+    }
+    
+    public boolean superUser(String name) {
+    	if(town == null || !town.getOwner().equals(getName())) {
+    		player.sendMessage(ChatColor.RED + "[SimpleZones] You are not the owner of a town.");
+    	} else if (!town.getMembers().contains(name)) {
+    		player.sendMessage(ChatColor.RED + "[SimpleZones] " + name + " is not a member of your town.");
+    	} else {
+    		town.modSuper(name, !town.isSuper(this));
+    		if(town.isSuper(this)) {
+    			player.sendMessage(ChatColor.GOLD + "[SimpleZones] " + name + " is now a Superuser!");
+    		} else player.sendMessage(ChatColor.GOLD + "[SimpleZones] " + name + " is no longer a Superuser.");
+    	}
+    	return true;
+    }
+    
+    public boolean makeSanct() {
+        if (corner2 == null || (corner1.getBlockX() == 0 && corner1.getBlockY() == 0 && corner1.getBlockZ() == 0)) {
+            player.sendMessage(ChatColor.RED + "[SimpleZones] You need to define points first.");
+        } else if (OwnedLand.hasOverlap(corner1, corner2, false)) {
+            player.sendMessage(ChatColor.RED + "[SimpleZones] There is another area contained in your selection.");
+        } else {
+        	int id = 1;
+        	for(Sanctuary s : Sanctuary.getSancts()) {
+        		if(s.getID() >= id)
+        			id = s.getID() + 1;
+        	}
+        	Sanctuary.modSancts(new Sanctuary(id, corner1, corner2));
+        	player.sendMessage(ChatColor.GOLD + "[SimpleZones] You have created a new Sanctuary.");
+        }
+    	return true;
+    }
+    
+    public boolean delSanct() {
+    	OwnedLand check = OwnedLand.getLandAtPoint(player.getLocation());
+    	if(check instanceof Sanctuary) {
+    		OwnedLand.stripLocations(check);
+    		Sanctuary.modSancts((Sanctuary)check);
+    		player.sendMessage(ChatColor.GOLD + "[SimpleZones] This Sanctuary has been deleted.");
+    	} else player.sendMessage(ChatColor.RED + "[SimpleZones] You aren't standing in a Sanctuary!");
+    	return true;
     }
 }

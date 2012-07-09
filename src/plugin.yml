@@ -1,6 +1,6 @@
 name: SimpleZones
 main: com.zephyrr.simplezones.SimpleZones
-version: 0.5
+version: 0.6
 author: PhoenixFlight
 permissions:
   Zone.*:
@@ -23,6 +23,17 @@ permissions:
       Zone.massmail: true
       Zone.flag: true
       Zone.help: true
+  Zone.admin.*:
+    description: Grants all Zone Admin commands.
+    children:
+      Zone.admin.sanct.create: true
+      Zone.admin.sanct.delete: true
+  Zone.admin.sanct.create:
+    description: Allows admins to create sanctuaries.
+    default: false
+  Zone.admin.sanct.delete:
+    description: Allows admins to delete sanctuaries.
+    default: false
   Zone.massmail:
     description: Allows town owners to send mass mails to their entire town.
   Zone.define:

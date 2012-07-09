@@ -12,6 +12,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import com.zephyrr.simplezones.Channel;
 import com.zephyrr.simplezones.land.OwnedLand;
 import com.zephyrr.simplezones.land.Plot;
+import com.zephyrr.simplezones.land.Sanctuary;
 import com.zephyrr.simplezones.land.Town;
 
 import java.util.HashSet;
@@ -33,11 +34,17 @@ public class PlayerListener implements Listener {
         OwnedLand from = OwnedLand.getLandAtPoint(event.getFrom());
         OwnedLand to = OwnedLand.getLandAtPoint(event.getTo());
         if(from != to) {
+        	if(from instanceof Sanctuary) {
+        		event.getPlayer().sendMessage(ChatColor.GOLD + "[SimpleZones] You are now leaving a Sanctuary.");
+        	}
             if(from instanceof Town) {
                 if(to instanceof Plot)
                     if(((Plot)to).getTown() == from)
                         return;
                 event.getPlayer().sendMessage(ChatColor.GOLD + "[SimpleZones] You are now leaving " + ((Town)from).getName());
+            }
+            if(to instanceof Sanctuary) {
+            	event.getPlayer().sendMessage(ChatColor.GOLD + "[SimpleZones] You are now entering a Sanctuary.");
             }
             if(to instanceof Town) {
                 if(from instanceof Plot)
@@ -61,6 +68,8 @@ public class PlayerListener implements Listener {
         Town toCheck;
         if(ol instanceof Plot)
             toCheck = ((Plot)ol).getTown();
+        else if(ol instanceof Sanctuary)
+        	return;
         else toCheck = (Town)ol;
         if(!toCheck.getOwner().equals(event.getPlayer().getName()) && !ol.getMembers().contains(event.getPlayer().getName()))
             event.setCancelled(true);
