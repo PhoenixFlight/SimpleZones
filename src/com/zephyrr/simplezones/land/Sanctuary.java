@@ -2,6 +2,7 @@ package com.zephyrr.simplezones.land;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.ResultSet;
@@ -26,8 +27,9 @@ public class Sanctuary extends OwnedLand {
 	}
 	
 	public static void modSancts(Sanctuary s) {
-		if(!sancts.remove(s))
+		if(!sancts.remove(s)) {
 			sancts.add(s);
+		}
 	}
 	
 	public static ArrayList<Sanctuary> getSancts() {
@@ -118,7 +120,7 @@ public class Sanctuary extends OwnedLand {
 				symls.add(syml);
 			}
 			Yaml yml = new Yaml();
-			yml.dumpAll(symls.iterator());
+			yml.dumpAll(symls.iterator(), new FileWriter(f));
 		} catch(IOException ex) {
 			ex.printStackTrace();
 		}
