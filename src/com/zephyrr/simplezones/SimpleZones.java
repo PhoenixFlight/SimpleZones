@@ -79,6 +79,7 @@ public class SimpleZones extends JavaPlugin {
         ZonePlayer.fill(db, prefix);
         Town.fillBans(db, prefix);
         Mail.fill(db, prefix);
+        Sanctuary.fill(db, prefix);
 
         if (!new File("plugins/SimpleZones/config.yml").exists()) {
             saveDefaultConfig();

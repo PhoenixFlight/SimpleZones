@@ -61,12 +61,15 @@ public class Sanctuary extends OwnedLand {
 	
 	private static void fillYML() {
 		try {
+	        SimpleZones.getDefaultWorld().getEntities().get(0).getServer().broadcastMessage("JC");
 	        File f = new File("plugins/SimpleZones/sanctuaries.yml");
 	        if(!f.exists())
 	            return;
 	        InputStream in = new FileInputStream(f);
 	        Yaml yaml = new Yaml(new CustomClassLoaderConstructor(SanctuaryYml.class.getClassLoader()));
+	        SimpleZones.getDefaultWorld().getEntities().get(0).getServer().broadcastMessage("JL");
 	        for(Object o : yaml.loadAll(in)) {
+		        SimpleZones.getDefaultWorld().getEntities().get(0).getServer().broadcastMessage("JN");
 	        	SanctuaryYml syml = (SanctuaryYml)o;
 	        	int xLow = syml.lowX;
 	        	int zLow = syml.lowZ;
