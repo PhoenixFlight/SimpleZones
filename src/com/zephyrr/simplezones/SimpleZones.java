@@ -14,6 +14,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import sqlibrary.*;
 
 import com.zephyrr.simplezones.land.Plot;
+import com.zephyrr.simplezones.land.Sanctuary;
 import com.zephyrr.simplezones.land.Town;
 import com.zephyrr.simplezones.listeners.*;
 import java.sql.SQLException;
@@ -566,6 +567,7 @@ public class SimpleZones extends JavaPlugin {
         ZonePlayer.save(db, prefix);
         Town.saveBans(db, prefix);
         Mail.save(db, prefix);
+        Sanctuary.save(db, prefix);
         if (db != null) {
             db.close();
         }
