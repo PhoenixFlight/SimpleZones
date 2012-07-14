@@ -100,7 +100,7 @@ public class Sanctuary extends OwnedLand {
 					", " + s.getUpperBound().getBlockX() +
 					", " + s.getLowerBound().getBlockZ() +
 					", " + s.getUpperBound().getBlockZ() +
-					", " + s.getLowerBound().getWorld().getName() +
+					", '" + s.getLowerBound().getWorld().getName() + "'" +
 					")";
 			db.query(query);
 		}
