@@ -21,7 +21,7 @@ public abstract class OwnedLand {
         for(int r = low.getBlockX(); r <= high.getBlockX(); r++) {
             for(int c = low.getBlockZ(); c <= high.getBlockZ(); c++) {
                 Location toPlace = new Location(low.getWorld(), r, YCHECK, c);
-                if(getLandAtPoint(toPlace) == null)
+                if(getLandAtPoint(toPlace) == null || sender instanceof Plot)
                     locIndex.put(toPlace, sender);
             }
         }

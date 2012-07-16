@@ -75,9 +75,9 @@ public class Town extends OwnedLand {
                 t.setOwner(owner);
                 t.setWarp(warp);
                 for(String s : members)
-                    t.addMember(s);
+                    t.addMember(s.replaceAll(" ", ""));
                 for(String s : supers)
-                	t.modSuper(s, true);
+                	t.modSuper(s.replaceAll(" ", ""), true);
                 t.putFlags(animals, monsters, blocks, fire, explode);
                 townList.put(name, t);
             }
@@ -154,7 +154,7 @@ public class Town extends OwnedLand {
                     t.addMember(s.replaceAll(" ", ""));
                 if(supers != null)
                 	for(String s : supers)
-                		t.modSuper(s, true);
+                		t.modSuper(s.replaceAll(" ",  ""), true);
                 t.setOwner(ty.owner);
                 t.setWarp(warp);
                 t.putFlags(ty.animals, ty.monsters, ty.blocks, ty.fire, ty.bomb);
@@ -302,7 +302,8 @@ public class Town extends OwnedLand {
         flags.loadStarts(animals, monsters, blocks, fire, bomb);
     }
     public boolean isSuper(ZonePlayer zp) {
-    	return supers.contains(zp);
+    	zp.getPlayer().sendMessage(supers.toString());
+    	return supers.contains(zp.getName());
     }
     public boolean modSuper(String zp, boolean change) {
     	if(change)

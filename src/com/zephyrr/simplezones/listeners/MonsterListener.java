@@ -2,6 +2,7 @@ package com.zephyrr.simplezones.listeners;
 
 import com.zephyrr.simplezones.land.OwnedLand;
 import com.zephyrr.simplezones.land.Plot;
+import com.zephyrr.simplezones.land.Sanctuary;
 import com.zephyrr.simplezones.land.Town;
 
 import org.bukkit.event.EventHandler;
@@ -16,7 +17,7 @@ public class MonsterListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onSpawn(CreatureSpawnEvent event) {
         OwnedLand land = OwnedLand.getLandAtPoint(event.getLocation());
-        if(land == null)
+        if(land == null || land instanceof Sanctuary)
             return;
         if(land instanceof Plot)
             land = ((Plot)land).getTown();

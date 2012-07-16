@@ -606,8 +606,8 @@ public class ZonePlayer {
     	} else if (!town.getMembers().contains(name)) {
     		player.sendMessage(ChatColor.RED + "[SimpleZones] " + name + " is not a member of your town.");
     	} else {
-    		town.modSuper(name, !town.isSuper(this));
-    		if(town.isSuper(this)) {
+    		town.modSuper(name, !town.isSuper(ZonePlayer.findUser(name)));
+    		if(town.isSuper(ZonePlayer.findUser(name))) {
     			player.sendMessage(ChatColor.GOLD + "[SimpleZones] " + name + " is now a Superuser!");
     		} else player.sendMessage(ChatColor.GOLD + "[SimpleZones] " + name + " is no longer a Superuser.");
     	}
