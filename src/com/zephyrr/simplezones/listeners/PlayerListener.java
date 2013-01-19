@@ -5,7 +5,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerChatEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -75,7 +75,7 @@ public class PlayerListener implements Listener {
             event.setCancelled(true);
     }
     @EventHandler
-    public void onChat(PlayerChatEvent event) {
+    public void onChat(AsyncPlayerChatEvent event) {
         if(ZonePlayer.findUser(event.getPlayer()).getChannel() == Channel.TOWN) {
             event.setMessage(ChatColor.AQUA + event.getMessage());
             HashSet<Player> set = new HashSet<Player>();
