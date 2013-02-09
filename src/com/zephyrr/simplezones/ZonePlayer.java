@@ -333,6 +333,10 @@ public class ZonePlayer {
                 player.sendMessage(ChatColor.RED + "[SimpleZones] There is another town contained in your selection.");
             } else if (Town.getTown(name) != null) {
                 player.sendMessage(ChatColor.RED + "[SimpleZones] There is already a town named " + name);
+            } else if (SimpleZones.getPlugConfig().getBoolean("town.maxSizeEnabled") && (
+            		Math.max(corner1.getBlockX(), corner2.getBlockX()) - Math.min(corner1.getBlockX(), corner2.getBlockX()) > SimpleZones.getPlugConfig().getInt("town.maxX")
+            		|| Math.max(corner2.getBlockZ(), corner1.getBlockZ()) - Math.min(corner1.getBlockZ(), corner2.getBlockZ()) > SimpleZones.getPlugConfig().getInt("town.maxZ"))) {
+            	player.sendMessage(ChatColor.RED + "[SimpleZones] Your town has exceeded the maximum dimensions of " + SimpleZones.getPlugConfig().getInt("town.maxX") + "x" + SimpleZones.getPlugConfig().getInt("town.maxZ"));
             } else {
                 int max = 1;
                 for(Town t : Town.getTownList().values())

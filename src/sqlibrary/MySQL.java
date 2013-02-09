@@ -97,7 +97,7 @@ public class MySQL extends Database {
     public ResultSet query(String query) {
         //Connection connection = null;
         Statement statement = null;
-        ResultSet result = null/*new JdbcRowSetImpl()*/;
+        ResultSet result = null;
         try {
             //connection = open();
             //if (checkConnection())

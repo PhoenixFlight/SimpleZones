@@ -1,0 +1,132 @@
+name: SimpleZones
+main: com.zephyrr.simplezones.SimpleZones
+version: 0.6
+author: PhoenixFlight
+permissions:
+  Zone.*:
+    description: Gives access to all SimpleZones commands.
+    children:
+      Zone.define: true
+      Zone.create: true
+      Zone.setowner: true
+      Zone.invite: true
+      Zone.ban: true
+      Zone.unban: true
+      Zone.setwarp: true
+      Zone.plot.*: true
+      Zone.delete: true
+      Zone.list: true
+      Zone.members: true
+      Zone.warp: true
+      Zone.join: true
+      Zone.leave: true
+      Zone.massmail: true
+      Zone.flag: true
+      Zone.help: true
+  Zone.admin.*:
+    description: Grants all Zone Admin commands.
+    children:
+      Zone.admin.sanct.create: true
+      Zone.admin.sanct.delete: true
+  Zone.admin.sanct.create:
+    description: Allows admins to create sanctuaries.
+    default: false
+  Zone.admin.sanct.delete:
+    description: Allows admins to delete sanctuaries.
+    default: false
+  Zone.massmail:
+    description: Allows town owners to send mass mails to their entire town.
+  Zone.define:
+    description: Allows users to define boundaries for new Towns.
+  Zone.flag:
+    description: Allows users to set flags for their town.
+  Zone.create:
+    description: Allows users to create new Towns using preset boundaries.
+    children:
+      Zone.define: true
+  Zone.setowner:
+    description: Allows users to transfer ownership of their towns.
+  Zone.invite:
+    description: Allows users to invite new members to their town.
+  Zone.ban:
+    description: Allows users to ban players from accessing their town.
+  Zone.unban:
+    description: Allows users to unban players from their town.
+  Zone.setwarp:
+    description: Allows users to set a warp point for their town.
+  Zone.plot.define:
+    description: Allows users to define plots for their town.
+  Zone.plot.create:
+    description: Allows users to create plots for their town.
+    children:
+      Zone.plot.define: true
+  Zone.plot.addmember:
+    description: Allows users to add members to plots.
+  Zone.plot.removemember:
+    description: Allows users to remove members from a plot.
+  Zone.plot.delete:
+    description: Allows town owners to delete plots in their town.
+  Zone.delete:
+    description: Allows a user to delete their town.
+    default: false
+  Zone.list:
+    description: Allows a user to view a list of towns.
+    default: true
+  Zone.warp:
+    description: Allows a user to warp to a town.
+    default: true
+  Zone.join:
+    description: Allows a user to request to join a town.
+    default: true
+  Zone.leave:
+    description: Allows a user to renounce membership in a town.
+    default: true
+  Zone.help:
+    description: Allows access to the help pages.
+    default: true
+  Zone.plot.*:
+    description: Allows all of the plot commands.
+    children:
+      Zone.plot.create: true
+      Zone.plot.define: true
+      Zone.plot.addmember: true
+      Zone.plot.removemember: true
+      Zone.plot.delete: true
+  Mail.send:
+    description: Allows the user to send mail.
+    default: true
+  Mail.read:
+    description: Allows the user to read their mail.
+    default: true
+  Mail.info:
+    description: Allows the user to check information about mail items, such as the sender and whether or not it has been read.
+    default: true
+  Mail.help:
+    description: Allows a user to view the help information for the Mail commands.
+    default: true
+  Mail.delete:
+    description: Allows a user to remove a message from their mailbox.
+    default: true
+  Mail.*:
+    description: Gives a user access to all mail commands.
+    children:
+      Mail.send: true
+      Mail.read: true
+      Mail.info: true
+      Mail.help: true
+      Mail.delete: true
+  Zchat.*:
+    description: Gives a user access to all Zone Chat commands.
+    children:
+      Zchat.toggle: true
+      Zchat.toggleview: true
+  Zchat.toggle:
+    description: Allows a user to toggle their chat channel.
+    default: true
+commands:
+  zone:
+    usage: /zone help [#]
+  mail:
+    usage: /mail help
+  zchat:
+    usage: /zchat help
