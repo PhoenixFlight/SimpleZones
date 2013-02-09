@@ -73,6 +73,7 @@ public class SimpleZones extends JavaPlugin {
             }
             saveDefaultConfig();
         }
+        getConfig().options().copyDefaults(true);
 
         Town.fill(db, prefix);
         Plot.fill(db, prefix);
@@ -80,9 +81,10 @@ public class SimpleZones extends JavaPlugin {
         Town.fillBans(db, prefix);
         Mail.fill(db, prefix);
         Sanctuary.fill(db, prefix);
-
         if (!new File("plugins/SimpleZones/config.yml").exists()) {
             saveDefaultConfig();
+        } else {
+        	
         }
 
         for (Player p : getServer().getOnlinePlayers()) {
