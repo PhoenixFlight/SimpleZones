@@ -229,7 +229,7 @@ public class SimpleZones extends JavaPlugin {
         if (args.length == 0) {
             return false;
         }
-        if (command.getName().equalsIgnoreCase("zone")) {
+        if (command.getName().equalsIgnoreCase("szone")) {
             if (args.length >= 2 && args[0].equalsIgnoreCase("plot")) {
                 if (args[1].equalsIgnoreCase("define") && sender.hasPermission("Zone.plot.define")) {
                     return zoneSender.plotDefine();
@@ -347,7 +347,7 @@ public class SimpleZones extends JavaPlugin {
                 showTownHelp(send, args);
                 return true;
             }
-        } else if (command.getName().equalsIgnoreCase("mail")) {
+        } else if (command.getName().equalsIgnoreCase("smail")) {
             if (args[0].equalsIgnoreCase("send") && sender.hasPermission("Mail.send")) {
                 if (args.length < 3) {
                     return false;
@@ -454,99 +454,99 @@ public class SimpleZones extends JavaPlugin {
         }
         ArrayList<String> al = new ArrayList<String>();
         if (p.hasPermission("Zone.define")) {
-            al.add(ChatColor.GREEN + "/zone define");
+            al.add(ChatColor.GREEN + "/szone define");
             al.add(ChatColor.GOLD + "Starts the cuboid selection process to define a town.");
         }
         if (p.hasPermission("Zone.create")) {
-            al.add(ChatColor.GREEN + "/zone create <name>");
+            al.add(ChatColor.GREEN + "/szone create <name>");
             al.add(ChatColor.GOLD + "Creates a town from the selection.");
         }
         if (ZonePlayer.findUser(p).getTown() != null && ZonePlayer.findUser(p).getTown().getOwner().equals(p.getName())) {
-        	al.add(ChatColor.GREEN + "/zone setEntryMessage <message>");
+        	al.add(ChatColor.GREEN + "/szone setEntryMessage <message>");
         	al.add(ChatColor.GOLD + "Sets the message that players will see when entering your town.");
         }
         if (p.hasPermission("Zone.massmail")) {
-            al.add(ChatColor.GREEN + "/zone massmail <message>");
+            al.add(ChatColor.GREEN + "/szone massmail <message>");
             al.add(ChatColor.GOLD + "Sends a mail message to all members of your town.");
         }
         if (p.hasPermission("Zone.setowner")) {
-            al.add(ChatColor.GREEN + "/zone setowner <player>");
+            al.add(ChatColor.GREEN + "/szone setowner <player>");
             al.add(ChatColor.GOLD + "Transfers ownership to <player>. You must own the town.");
         }
         if (p.hasPermission("Zone.invite")) {
-            al.add(ChatColor.GREEN + "/zone invite <player>");
+            al.add(ChatColor.GREEN + "/szone invite <player>");
             al.add(ChatColor.GOLD + "Adds <player> to your town.");
         }
         if (p.hasPermission("Zone.ban")) {
-            al.add(ChatColor.GREEN + "/zone ban <player>");
+            al.add(ChatColor.GREEN + "/szone ban <player>");
             al.add(ChatColor.GOLD + "Bans <player> from your town.  They are kicked, cannot ask to join, and cannot enter the town anymore.");
         }
         if (p.hasPermission("Zone.unban")) {
-            al.add(ChatColor.GREEN + "/zone unban <player>");
+            al.add(ChatColor.GREEN + "/szone unban <player>");
             al.add(ChatColor.GOLD + "Unbans <player> from your town.");
         }
         if (p.hasPermission("Zone.delete")) {
-            al.add(ChatColor.GREEN + "/zone delete");
+            al.add(ChatColor.GREEN + "/szone delete");
             al.add(ChatColor.GOLD + "Permanently deletes your town.");
         }
         if (p.hasPermission("Zone.setwarp")) {
-            al.add(ChatColor.GREEN + "/zone setwarp");
+            al.add(ChatColor.GREEN + "/szone setwarp");
             al.add(ChatColor.GOLD + "Sets the warp point for your town to your location.");
         }
         if (p.hasPermission("Zone.plot.define")) {
-            al.add(ChatColor.GREEN + "/zone plot define");
+            al.add(ChatColor.GREEN + "/szone plot define");
             al.add(ChatColor.GOLD + "Starts the cuboid selection process to define a plot.");
         }
         if (p.hasPermission("Zone.plot.create")) {
-            al.add(ChatColor.GREEN + "/zone plot create");
+            al.add(ChatColor.GREEN + "/szone plot create");
             al.add(ChatColor.GOLD + "Creates a plot from the given selection.");
         }
         if (p.hasPermission("Zone.plot.delete")) {
-            al.add(ChatColor.GREEN + "/zone plot delete");
+            al.add(ChatColor.GREEN + "/szone plot delete");
             al.add(ChatColor.GOLD + "Deletes the plot in which you are currently standing.");
         }
         if (p.hasPermission("Zone.plot.addmember")) {
-            al.add(ChatColor.GREEN + "/zone plot addmember <player>");
+            al.add(ChatColor.GREEN + "/szone plot addmember <player>");
             al.add(ChatColor.GOLD + "Allows <player to build in the plot you're standing in.");
         }
         if (p.hasPermission("Zone.plot.removemember")) {
-            al.add(ChatColor.GREEN + "/zone plot removemember <player>");
+            al.add(ChatColor.GREEN + "/szone plot removemember <player>");
             al.add(ChatColor.GOLD + "Disallows <player> to build in the plot you're standing in.");
         }
         if (p.hasPermission("Zone.list")) {
-            al.add(ChatColor.GREEN + "/zone list");
+            al.add(ChatColor.GREEN + "/szone list");
             al.add(ChatColor.GOLD + "Lists all towns");
         }
         if (p.hasPermission("Zone.members")) {
-            al.add(ChatColor.GREEN + "/zone members <town>");
+            al.add(ChatColor.GREEN + "/szone members <town>");
             al.add(ChatColor.GOLD + "Lists the members in <town>");
         }
         if (p.hasPermission("Zone.warp")) {
-            al.add(ChatColor.GREEN + "/zone warp <town>");
+            al.add(ChatColor.GREEN + "/szone warp <town>");
             al.add(ChatColor.GOLD + "Warps you to <town>");
         }
         if (p.hasPermission("Zone.join")) {
-            al.add(ChatColor.GREEN + "/zone join <town>");
+            al.add(ChatColor.GREEN + "/szone join <town>");
             al.add(ChatColor.GOLD + "Notifies the owner of <town> that you would like to join.");
         }
         if (p.hasPermission("Zone.leave")) {
-            al.add(ChatColor.GREEN + "/zone leave");
+            al.add(ChatColor.GREEN + "/szone leave");
             al.add(ChatColor.GOLD + "Leaves the current town.");
         }
         if(p.hasPermission("Zone.flag")) {
-        	al.add(ChatColor.GREEN + "/zone flag <flags>");
+        	al.add(ChatColor.GREEN + "/szone flag <flags>");
         	al.add(ChatColor.GOLD + "Sets protection flags for your town.  Type " + ChatColor.GREEN + "/zone flag" + ChatColor.GOLD + " without any parameters to see information on specific flags.");
         }
         if(p.hasPermission("Zone.super")) {
-        	al.add(ChatColor.GREEN + "/zone super <player>");
+        	al.add(ChatColor.GREEN + "/szone super <player>");
         	al.add(ChatColor.GOLD + "Toggle's the given user's Superuser status in your town.  Superusers can build in unplotted areas of the town.");
         }
         if(p.hasPermission("Zone.admin.sanct.create")) {
-        	al.add(ChatColor.GREEN + "/zone admin sanct create");
+        	al.add(ChatColor.GREEN + "/szone admin sanct create");
         	al.add(ChatColor.GOLD + "Creates a Sanctuary where no towns can be formed using your most recent selection.");
         }
         if(p.hasPermission("Zone.admin.sanct.delete")) {
-        	al.add(ChatColor.GREEN + "/zone admin sanct delete");
+        	al.add(ChatColor.GREEN + "/szone admin sanct delete");
         	al.add(ChatColor.GOLD + "Deletes the Sanctuary in which you are standing.");
         }
         page--;
@@ -558,17 +558,17 @@ public class SimpleZones extends JavaPlugin {
 
     private void showMailHelp(Player p) {
         ArrayList<String> al = new ArrayList<String>();
-        if (p.hasPermission("Mail.send")) {
-            al.add(ChatColor.GREEN + "/mail send <player> <message>");
+        if (p.hasPermission("SMail.send")) {
+            al.add(ChatColor.GREEN + "/smail send <player> <message>");
         }
-        if (p.hasPermission("Mail.read")) {
-            al.add(ChatColor.GREEN + "/mail read <index>");
+        if (p.hasPermission("SMail.read")) {
+            al.add(ChatColor.GREEN + "/smail read <index>");
         }
-        if (p.hasPermission("Mail.info")) {
-            al.add(ChatColor.GREEN + "/mail info [index]");
+        if (p.hasPermission("SMail.info")) {
+            al.add(ChatColor.GREEN + "/smail info [index]");
         }
-        if (p.hasPermission("Mail.delete")) {
-            al.add(ChatColor.GREEN + "/mail delete <index>");
+        if (p.hasPermission("SMail.delete")) {
+            al.add(ChatColor.GREEN + "/smail delete <index>");
         }
         for (String s : al) {
             p.sendMessage(s);

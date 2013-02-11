@@ -92,29 +92,29 @@ permissions:
       Zone.plot.addmember: true
       Zone.plot.removemember: true
       Zone.plot.delete: true
-  Mail.send:
+  SMail.send:
     description: Allows the user to send mail.
     default: true
-  Mail.read:
+  SMail.read:
     description: Allows the user to read their mail.
     default: true
-  Mail.info:
+  SMail.info:
     description: Allows the user to check information about mail items, such as the sender and whether or not it has been read.
     default: true
-  Mail.help:
+  SMail.help:
     description: Allows a user to view the help information for the Mail commands.
     default: true
-  Mail.delete:
+  SMail.delete:
     description: Allows a user to remove a message from their mailbox.
     default: true
-  Mail.*:
+  SMail.*:
     description: Gives a user access to all mail commands.
     children:
-      Mail.send: true
-      Mail.read: true
-      Mail.info: true
-      Mail.help: true
-      Mail.delete: true
+      SMail.send: true
+      SMail.read: true
+      SMail.info: true
+      SMail.help: true
+      SMail.delete: true
   Zchat.*:
     description: Gives a user access to all Zone Chat commands.
     children:
@@ -124,9 +124,9 @@ permissions:
     description: Allows a user to toggle their chat channel.
     default: true
 commands:
-  zone:
-    usage: /zone help [#]
-  mail:
-    usage: /mail help
+  szone:
+    usage: /szone help [#]
+  smail:
+    usage: /smail help
   zchat:
     usage: /zchat help
