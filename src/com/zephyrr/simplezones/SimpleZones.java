@@ -348,7 +348,7 @@ public class SimpleZones extends JavaPlugin {
                 return true;
             }
         } else if (command.getName().equalsIgnoreCase("smail")) {
-            if (args[0].equalsIgnoreCase("send") && sender.hasPermission("Mail.send")) {
+            if (args[0].equalsIgnoreCase("send") && sender.hasPermission("SMail.send")) {
                 if (args.length < 3) {
                     return false;
                 }
@@ -363,7 +363,7 @@ public class SimpleZones extends JavaPlugin {
                 }
                 ZonePlayer.findUser(to).sendMail(new Mail(msg, false, zoneSender, false));
                 return true;
-            } else if (args[0].equalsIgnoreCase("info") && sender.hasPermission("Mail.info")) {
+            } else if (args[0].equalsIgnoreCase("info") && sender.hasPermission("SMail.info")) {
                 if (args.length == 1) {
                     zoneSender.getMailInfo();
                     return true;
@@ -373,7 +373,7 @@ public class SimpleZones extends JavaPlugin {
                 } catch (NumberFormatException ex) {
                 }
                 return true;
-            } else if (args[0].equalsIgnoreCase("read") && sender.hasPermission("Mail.read")) {
+            } else if (args[0].equalsIgnoreCase("read") && sender.hasPermission("SMail.read")) {
                 if (args.length == 1) {
                     return false;
                 }
@@ -382,10 +382,10 @@ public class SimpleZones extends JavaPlugin {
                 } catch (NumberFormatException ex) {
                 }
                 return true;
-            } else if (args[0].equalsIgnoreCase("help") && sender.hasPermission("Mail.help")) {
+            } else if (args[0].equalsIgnoreCase("help") && sender.hasPermission("SMail.help")) {
                 showMailHelp(send);
                 return true;
-            } else if (args[0].equalsIgnoreCase("delete") && sender.hasPermission("Mail.delete")) {
+            } else if (args[0].equalsIgnoreCase("delete") && sender.hasPermission("SMail.delete")) {
                 try {
                     zoneSender.deleteMail(Integer.parseInt(args[1]));
                 } catch (NumberFormatException ex) {
