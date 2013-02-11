@@ -219,7 +219,7 @@ public class ZonePlayer {
     public void sendMail(Mail message) {
         if (player != null && player.isOnline()) {
             player.sendMessage(ChatColor.GOLD + "[SimpleZones] You have received a new mail message.");
-            player.sendMessage(ChatColor.GOLD + "[SimpleZones] You can read it by typing " + ChatColor.GREEN + "/mail read " + (mail.size() + 1));
+            player.sendMessage(ChatColor.GOLD + "[SimpleZones] You can read it by typing " + ChatColor.GREEN + "/smail read " + (mail.size() + 1));
         }
         mail.add(message);
     }

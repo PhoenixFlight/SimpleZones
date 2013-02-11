@@ -362,6 +362,7 @@ public class SimpleZones extends JavaPlugin {
                     msg += args[i] + " ";
                 }
                 ZonePlayer.findUser(to).sendMail(new Mail(msg, false, zoneSender, false));
+                send.sendMessage(ChatColor.GOLD + "[SimpleZones] Message sent to " + to);
                 return true;
             } else if (args[0].equalsIgnoreCase("info") && sender.hasPermission("SMail.info")) {
                 if (args.length == 1) {
