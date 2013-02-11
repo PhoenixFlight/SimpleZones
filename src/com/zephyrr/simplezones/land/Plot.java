@@ -68,8 +68,6 @@ public class Plot extends OwnedLand {
                 String members = "";
                 for(String s : p.getMembers())
                     members += s + ",";
-                if(!members.isEmpty())
-                    members = members.substring(0, members.length() - 1);
                 String query = "INSERT INTO " + prefix + "plots VALUES("
                         + id + ","
                         + town + ","

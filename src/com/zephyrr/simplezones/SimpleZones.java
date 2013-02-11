@@ -5,6 +5,9 @@ import com.zephyrr.simplezones.flags.AnimalFlag.AniIDs;
 import com.zephyrr.simplezones.flags.MonsterFlag;
 import com.zephyrr.simplezones.flags.MonsterFlag.MobIDs;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.Command;
@@ -19,6 +22,8 @@ import com.zephyrr.simplezones.land.Town;
 import com.zephyrr.simplezones.listeners.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
+
+import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.FileConfiguration;
 
 /**
@@ -28,7 +33,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 public class SimpleZones extends JavaPlugin {
 
     private static JavaPlugin plug;
-    private static double VERSION = 0.6;
+    private static double VERSION = 0.7;
 
     public static Player getPlayer(String name) {
         return plug.getServer().getPlayer(name);
@@ -69,24 +74,30 @@ public class SimpleZones extends JavaPlugin {
 
         if (!getConfig().contains("version") || getConfig().getDouble("version") != VERSION) {
             if (new File("plugins/SimpleZones/config.yml").exists()) {
-                new File("plugins/SimpleZones/config.yml").delete();
+		        getConfig().options().copyDefaults(true);
+		        getConfig().set("version", VERSION);
             }
-            saveDefaultConfig();
         }
-        getConfig().options().copyDefaults(true);
-
         Town.fill(db, prefix);
         Plot.fill(db, prefix);
         ZonePlayer.fill(db, prefix);
         Town.fillBans(db, prefix);
         Mail.fill(db, prefix);
         Sanctuary.fill(db, prefix);
-        if (!new File("plugins/SimpleZones/config.yml").exists()) {
+        if (!new File("plugins/SimpleZones/config.yml").exists()) 
             saveDefaultConfig();
-        } else {
-        	
-        }
-
+        for(World w : getServer().getWorlds()) 
+        	if(!getConfig().contains("world." + w.getName())) {
+        		MemorySection.createPath(getConfig().getRoot(), "world." + w.getName());
+        		getConfig().set("world." + w.getName(), true);
+        	}
+		try {
+			FileWriter fw = new FileWriter(new File("plugins/SimpleZones/config.yml"));
+			fw.write(getConfig().saveToString());
+			fw.close();
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
         for (Player p : getServer().getOnlinePlayers()) {
             ZonePlayer.registerUser(p);
             ZonePlayer.findUser(p.getName()).setPlayer(p);
@@ -108,6 +119,8 @@ public class SimpleZones extends JavaPlugin {
         addColumnUnlessExists(prefix + "towns", "Fire", "boolean");
         addColumnUnlessExists(prefix + "towns", "Bomb", "boolean");
         addColumnUnlessExists(prefix + "towns", "SuperUsers", "text");
+        addColumnUnlessExists(prefix + "towns", "EntryMessage", "text");
+        addColumnUnlessExists(prefix + "towns", "PvP", "boolean");
     }
 
     private void firstRun() {
@@ -236,6 +249,15 @@ public class SimpleZones extends JavaPlugin {
                     return zoneSender.plotDelete();
                 }
                 return false;
+            } else if(args[0].equalsIgnoreCase("setEntryMessage") && (zoneSender.getTown() != null && zoneSender.getTown().getOwner().equals(send.getName()))) { 
+            	if(args.length == 1) {
+            		return false;
+            	} 
+            	String words = "";
+            	for(int i = 1; i < args.length; i++)
+            		words += args[i] + " ";
+            	zoneSender.getTown().setEntryMessage(words);
+            	return true;
             } else if (args[0].equalsIgnoreCase("flag") && sender.hasPermission("Zone.flag")) {
                 return zoneSender.flag(args);
             } else if (args[0].equalsIgnoreCase("aIdList") && sender.hasPermission("Zone.flag")) {
@@ -438,6 +460,10 @@ public class SimpleZones extends JavaPlugin {
         if (p.hasPermission("Zone.create")) {
             al.add(ChatColor.GREEN + "/zone create <name>");
             al.add(ChatColor.GOLD + "Creates a town from the selection.");
+        }
+        if (ZonePlayer.findUser(p).getTown() != null && ZonePlayer.findUser(p).getTown().getOwner().equals(p.getName())) {
+        	al.add(ChatColor.GREEN + "/zone setEntryMessage <message>");
+        	al.add(ChatColor.GOLD + "Sets the message that players will see when entering your town.");
         }
         if (p.hasPermission("Zone.massmail")) {
             al.add(ChatColor.GREEN + "/zone massmail <message>");

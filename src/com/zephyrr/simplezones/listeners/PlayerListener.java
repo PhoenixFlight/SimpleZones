@@ -5,6 +5,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
@@ -54,7 +55,7 @@ public class PlayerListener implements Listener {
                 if(!event.getPlayer().isOp() && ((Town)to).getBans().contains(zp)) {
                     event.getPlayer().sendMessage(ChatColor.RED + "[SimpleZones] You have been banned from accessing " + ((Town)to).getName());
                     event.setCancelled(true);
-                } else event.getPlayer().sendMessage(ChatColor.GOLD + "[SimpleZones] You are now entering " + ((Town)to).getName());
+                } else event.getPlayer().sendMessage(ChatColor.GOLD + "[SimpleZones] " + ((Town)to).getEntryMessage());
             }
         }
     }
@@ -73,6 +74,20 @@ public class PlayerListener implements Listener {
         else toCheck = (Town)ol;
         if(!toCheck.getOwner().equals(event.getPlayer().getName()) && !ol.getMembers().contains(event.getPlayer().getName()))
             event.setCancelled(true);
+    }
+    @EventHandler
+    public void onEntityDamage(EntityDamageByEntityEvent event) {
+    	OwnedLand ol = OwnedLand.getLandAtPoint(event.getEntity().getLocation());
+    	if(ol == null || ol instanceof Sanctuary)
+    		return;
+    	Town t;
+    	if(ol instanceof Plot)
+    		t = ((Plot)ol).getTown();
+    	else if(ol instanceof Town)
+    		t = (Town)ol;
+    	else return;
+    	if(t.isBlocked(event))
+    		event.setCancelled(true);
     }
     @EventHandler
     public void onChat(AsyncPlayerChatEvent event) {

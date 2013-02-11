@@ -1,10 +1,10 @@
 package com.zephyrr.simplezones.flags;
 
-import com.zephyrr.simplezones.SimpleZones;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 
 /**
@@ -14,12 +14,13 @@ import org.bukkit.event.entity.ExplosionPrimeEvent;
 public class FlagSet {
     private Flag[] flags;
     public FlagSet() {
-        flags = new Flag[5];
+        flags = new Flag[6];
         flags[0] = new MonsterFlag();
         flags[1] = new AnimalFlag();
         flags[2] = new BlockFlag();
         flags[3] = new FireFlag();
         flags[4] = new BombFlag();
+        flags[5] = new PvpFlag();
     }
     public String getData(char flag) {
         switch(flag) {
@@ -33,16 +34,19 @@ public class FlagSet {
                 return flags[4].getData();
             case 'b':
                 return flags[2].getData();
+            case 'p':
+            	return flags[5].getData();
             default:
                 return "";
         }
     }
-    public void loadStarts(String a, String b, String c, boolean d, boolean e) {
+    public void loadStarts(String a, String b, String c, boolean d, boolean e, boolean f) {
         flags[0].loadTownSets(b);
         flags[1].loadTownSets(a);
         flags[2].loadTownSets(c);
         flags[3].loadTownSets(d + "");
         flags[4].loadTownSets(e + "");
+        flags[5].loadTownSets(f + "");
     }
     public boolean isBlocked(Object obj) {
         if(obj instanceof EntityType) {
@@ -53,6 +57,8 @@ public class FlagSet {
             return flags[3].isBlocked(null);
         } else if(obj instanceof ExplosionPrimeEvent) {
             return flags[4].isBlocked(null);
+        } else if(obj instanceof EntityDamageByEntityEvent) {
+        	return flags[5].isBlocked(obj);
         }
         return false;
     }
@@ -68,6 +74,9 @@ public class FlagSet {
             case 'e':
                 flags[4].setBlocked(null, s.charAt(0) == '+');
                 break;
+            case 'p':
+            	flags[5].setBlocked(null, s.charAt(0) == '+');
+            	break;
             case 'b':
                 if(s.length() == 2)
                     return false;
@@ -106,7 +115,6 @@ public class FlagSet {
                     try {
                         id = Integer.parseInt(s.substring(2));
                     } catch(NumberFormatException ex) {
-                        SimpleZones.getPlayer("Phoenix").sendMessage("Msg: " + s);
                         return false;
                     }
                     if(id < 1 || id > 15)

@@ -1,4 +1,4 @@
-version: 0.6
+version: 0.7
 wild:
   build: false
   break: true
@@ -44,6 +44,9 @@ default-flags:
     burn: true
   explode:
     blocked: true
+  pvp:
+    blocked: true
+world:
 database:
   type: yml
   prefix: SZ_

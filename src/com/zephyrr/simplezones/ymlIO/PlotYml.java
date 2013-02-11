@@ -12,4 +12,5 @@ public class PlotYml {
     public int lowZ;
     public int highZ;
     public String members;
+    public String interactors;
 }

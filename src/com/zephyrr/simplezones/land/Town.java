@@ -65,6 +65,7 @@ public class Town extends OwnedLand {
                 String blocks = rs.getString("Blocks");
                 boolean fire = rs.getBoolean("Fire");
                 boolean explode = rs.getBoolean("Bomb");
+                boolean pvp = rs.getBoolean("PvP");
                 World w = SimpleZones.getWorld(world);
                 Location warp = new Location(w, warpX, warpY, warpZ);
                 String[] members = rs.getString("Members").split(",");
@@ -72,13 +73,14 @@ public class Town extends OwnedLand {
                 Location low = new Location(w, lowX, OwnedLand.YCHECK, lowZ);
                 Location high = new Location(w, highX, OwnedLand.YCHECK, highZ);
                 Town t = new Town(id, low, high, name);
+                t.setEntryMessage(rs.getString("EntryMessage"));
                 t.setOwner(owner);
                 t.setWarp(warp);
                 for(String s : members)
                     t.addMember(s.replaceAll(" ", ""));
                 for(String s : supers)
                 	t.modSuper(s.replaceAll(" ", ""), true);
-                t.putFlags(animals, monsters, blocks, fire, explode);
+                t.putFlags(animals, monsters, blocks, fire, explode, pvp);
                 townList.put(name, t);
             }
         } catch(SQLException ex) {
@@ -126,7 +128,9 @@ public class Town extends OwnedLand {
                     + "'" + t.getData('b') + "',"
                     + "" + t.getData('f') + ","
                     + "" + t.getData('e') + ","
-                    + "'" + t.supers.toString().substring(1, t.supers.toString().length() - 1) + "'"
+                    + "'" + t.supers.toString().substring(1, t.supers.toString().length() - 1) + "',"
+                    + "'" + t.getEntryMessage() + "',"
+                    + "" + t.getData('p') + ""
                     + ")";
             db.query(query);
         }
@@ -157,7 +161,8 @@ public class Town extends OwnedLand {
                 		t.modSuper(s.replaceAll(" ",  ""), true);
                 t.setOwner(ty.owner);
                 t.setWarp(warp);
-                t.putFlags(ty.animals, ty.monsters, ty.blocks, ty.fire, ty.bomb);
+                t.setEntryMessage(ty.entryMessage);
+                t.putFlags(ty.animals, ty.monsters, ty.blocks, ty.fire, ty.bomb, ty.pvp);
                 townList.put(ty.name, t);
             }
             input.close();
@@ -182,12 +187,14 @@ public class Town extends OwnedLand {
             ty.warpY = t.getWarp().getY();
             ty.warpZ = t.getWarp().getZ();
             ty.world = t.getWarp().getWorld().getName();
+            ty.entryMessage = t.getEntryMessage();
             ty.supers = t.supers.toString().substring(1, t.supers.toString().length() - 1);
             ty.animals = t.getData('a');
             ty.blocks = t.getData('b');
             ty.bomb = Boolean.parseBoolean(t.getData('e'));
             ty.fire = Boolean.parseBoolean(t.getData('f'));
             ty.monsters = t.getData('m');
+            ty.pvp = Boolean.parseBoolean(t.getData('p'));
             val.add(ty);
         }
         try {
@@ -284,7 +291,7 @@ public class Town extends OwnedLand {
             ex.printStackTrace();
         }
     }
-    private String name, owner;
+    private String name, owner, entry;
     private ArrayList<ZonePlayer> bans;
     private ArrayList<String> supers;
     private Location warp;
@@ -298,11 +305,10 @@ public class Town extends OwnedLand {
         plots = new ArrayList<Plot>();
         flags = new FlagSet();
     }
-    public void putFlags(String animals, String monsters, String blocks, boolean fire, boolean bomb) {
-        flags.loadStarts(animals, monsters, blocks, fire, bomb);
+    public void putFlags(String animals, String monsters, String blocks, boolean fire, boolean bomb, boolean pvp) {
+        flags.loadStarts(animals, monsters, blocks, fire, bomb, pvp);
     }
     public boolean isSuper(ZonePlayer zp) {
-    	zp.getPlayer().sendMessage(supers.toString());
     	return supers.contains(zp.getName());
     }
     public boolean modSuper(String zp, boolean change) {
@@ -327,6 +333,12 @@ public class Town extends OwnedLand {
     }
     public String getOwner() {
         return owner;
+    }
+    public void setEntryMessage(String entry) {
+    	this.entry = entry;
+    }
+    public String getEntryMessage() {
+    	return entry;
     }
     public void setOwner(String newOwner) {
         if(owner == null) {

@@ -327,9 +327,11 @@ public class ZonePlayer {
         if (town != null) {
             player.sendMessage(ChatColor.RED + "[SimpleZones] You can only be in one town at a time.");
         } else {
-            if (corner2 == null || (corner1.getBlockX() == 0 && corner1.getBlockY() == 0 && corner1.getBlockZ() == 0)) {
+        	if (corner2 == null || (corner1.getBlockX() == 0 && corner1.getBlockY() == 0 && corner1.getBlockZ() == 0)) {
                 player.sendMessage(ChatColor.RED + "[SimpleZones] You need to define points first.");
-            } else if (OwnedLand.hasOverlap(corner1, corner2, false)) {
+            } else if(SimpleZones.getPlugConfig().contains("world." + corner1.getWorld().getName()) && !SimpleZones.getPlugConfig().getBoolean("world." + corner1.getWorld().getName())) {
+        		player.sendMessage(ChatColor.RED + "[SimpleZones] You cannot create towns in this world.");
+        	} else if (OwnedLand.hasOverlap(corner1, corner2, false)) {
                 player.sendMessage(ChatColor.RED + "[SimpleZones] There is another town contained in your selection.");
             } else if (Town.getTown(name) != null) {
                 player.sendMessage(ChatColor.RED + "[SimpleZones] There is already a town named " + name);
@@ -344,6 +346,7 @@ public class ZonePlayer {
                         max = t.getID() + 1;
                 Town t = new Town(max, corner1, corner2, name);
                 town = t;
+                t.setEntryMessage("Welcome to " + t.getName());
                 t.setOwner(getName());
                 town.setWarp(player.getLocation());
                 Town.addTown(town);
@@ -619,7 +622,7 @@ public class ZonePlayer {
     }
     
     public boolean makeSanct() {
-        if (corner2 == null || (corner1.getBlockX() == 0 && corner1.getBlockY() == 0 && corner1.getBlockZ() == 0)) {
+        if (corner1 == null || corner2 == null || (corner1.getBlockX() == 0 && corner1.getBlockY() == 0 && corner1.getBlockZ() == 0)) {
             player.sendMessage(ChatColor.RED + "[SimpleZones] You need to define points first.");
         } else if (OwnedLand.hasOverlap(corner1, corner2, false)) {
             player.sendMessage(ChatColor.RED + "[SimpleZones] There is another area contained in your selection.");

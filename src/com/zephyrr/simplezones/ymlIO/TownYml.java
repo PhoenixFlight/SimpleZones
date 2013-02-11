@@ -14,10 +14,12 @@ public class TownYml {
     public String world;
     public String members;
     public String supers;
+    public String entryMessage;
     
     // Area protection flags
     public boolean bomb;
     public boolean fire;
+    public boolean pvp;
     public String animals;
     public String blocks;
     public String monsters;
