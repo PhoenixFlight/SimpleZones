@@ -584,8 +584,8 @@ public class SimpleZones extends JavaPlugin {
         	al.add(ChatColor.GOLD + "Transfers ownership of your current outpost to the specified user.");
         }
         if(p.hasPermission("Zone.outpost.flag")) {
-        	al.add(ChatColor.GREEN + "/szone flag <flags>");
-        	al.add(ChatColor.GOLD + "Sets protection flags for your outpost.  Type " + ChatColor.GREEN + "/zone flag" + ChatColor.GOLD + " without any parameters to see information on specific flags.");
+        	al.add(ChatColor.GREEN + "/szone outpost flag <flags>");
+        	al.add(ChatColor.GOLD + "Sets protection flags for your outpost.  Type " + ChatColor.GREEN + "/zone outpost flag" + ChatColor.GOLD + " without any parameters to see information on specific flags.");
         }
         if(p.hasPermission("Zone.outpost.members")) {
         	al.add(ChatColor.GREEN + "/szone outpost members");
