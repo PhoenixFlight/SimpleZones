@@ -804,4 +804,17 @@ public class ZonePlayer {
     	}
     	return true;
     }
+    
+    public boolean outpostMembers() {
+    	OwnedLand ol = OwnedLand.getLandAtPoint(getPlayer().getLocation());
+    	if(ol == null || ol.getLandType() != LandType.OUTPOST) {
+    		player.sendMessage(ChatColor.RED + "[SimpleZones] You are not standing in an outpost.");
+    	} else {
+    		Outpost out = (Outpost)ol;
+    		player.sendMessage(ChatColor.GOLD + "[SimpleZones] " + out.getOwner());
+    		for(String s : out.getMembers())
+    			player.sendMessage(ChatColor.GOLD + s);
+    	}
+    	return true;
+    }
 }

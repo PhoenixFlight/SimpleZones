@@ -261,6 +261,8 @@ public class SimpleZones extends JavaPlugin {
         			return zoneSender.outpostCreate();
         		} else if(args[1].equalsIgnoreCase("delete") && send.hasPermission("Zone.outpost.delete")) {
         			return zoneSender.outpostDelete();
+        		} else if(args[1].equalsIgnoreCase("members") && send.hasPermission("Zone.outpost.members")) { 
+        			return zoneSender.outpostMembers();
         		} else if(args[1].equalsIgnoreCase("flag") && send.hasPermission("Zone.outpost.flag")) {
     				return zoneSender.outpostFlag(args);
     			} else if(args.length > 2) {
@@ -556,6 +558,38 @@ public class SimpleZones extends JavaPlugin {
         if (p.hasPermission("Zone.plot.removemember")) {
             al.add(ChatColor.GREEN + "/szone plot removemember <player>");
             al.add(ChatColor.GOLD + "Disallows <player> to build in the plot you're standing in.");
+        }
+        if(p.hasPermission("Zone.outpost.define")) {
+        	al.add(ChatColor.GREEN + "/szone outpost define");
+        	al.add(ChatColor.GOLD + "Starts the cuboid selection process to define an outpost.");
+        }
+        if(p.hasPermission("Zone.outpost.create")) {
+        	al.add(ChatColor.GREEN + "/szone outpost create");
+        	al.add(ChatColor.GOLD + "Creates an outpost from the given selection.");
+        }
+        if(p.hasPermission("Zone.outpost.addmember")) {
+        	al.add(ChatColor.GREEN + "/szone outpost addmember <name>");
+        	al.add(ChatColor.GOLD + "Gives the specified member permission to build on your current outpost.");
+        }
+        if(p.hasPermission("Zone.outpost.removemember")) {
+        	al.add(ChatColor.GREEN + "/szone outpost removemember <name>");
+        	al.add(ChatColor.GOLD + "Removes the specified user from your current outpost's member list.");
+        }
+        if(p.hasPermission("Zone.outpost.delete")) {
+        	al.add(ChatColor.GREEN + "/szone outpost delete");
+        	al.add(ChatColor.GOLD + "Deletes the outpost that you are currently standing in.");
+        }
+        if(p.hasPermission("Zone.outpost.setowner")) {
+        	al.add(ChatColor.GREEN + "/szone outpost setowner <owner>");
+        	al.add(ChatColor.GOLD + "Transfers ownership of your current outpost to the specified user.");
+        }
+        if(p.hasPermission("Zone.outpost.flag")) {
+        	al.add(ChatColor.GREEN + "/szone flag <flags>");
+        	al.add(ChatColor.GOLD + "Sets protection flags for your outpost.  Type " + ChatColor.GREEN + "/zone flag" + ChatColor.GOLD + " without any parameters to see information on specific flags.");
+        }
+        if(p.hasPermission("Zone.outpost.members")) {
+        	al.add(ChatColor.GREEN + "/szone outpost members");
+        	al.add(ChatColor.GOLD + "Lists the members of the plot in which you are currently standing.");
         }
         if (p.hasPermission("Zone.list")) {
             al.add(ChatColor.GREEN + "/szone list");
