@@ -36,7 +36,7 @@ public abstract class OwnedLand {
                 Location check = new Location(first.getWorld(), r, YCHECK, c);
                 if(locIndex.containsKey(check))
                     if(!(locIndex.get(check) instanceof Town && errorTowns))
-                    return true;
+                    	return true;
             }
         }
         return false;

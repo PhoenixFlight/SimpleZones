@@ -32,24 +32,24 @@ public class PlayerListener implements Listener {
         OwnedLand from = OwnedLand.getLandAtPoint(event.getFrom());
         OwnedLand to = OwnedLand.getLandAtPoint(event.getTo());
         if(from != to) {
-        	if(from.getLandType() == LandType.OUTPOST)
+        	if(from != null && from.getLandType() == LandType.OUTPOST)
         		event.getPlayer().sendMessage(ChatColor.GOLD + "[SimpleZones] You are now leaving an outpost.");
-        	if(to.getLandType() == LandType.OUTPOST)
+        	if(to != null && to.getLandType() == LandType.OUTPOST)
         		event.getPlayer().sendMessage(ChatColor.GOLD + "[SimpleZones] You are now entering an outpost belonging to " + ((Outpost)to).getOwner());
-        	if(from.getLandType() == LandType.SANCTUARY) {
+        	if(from != null && from.getLandType() == LandType.SANCTUARY) {
         		event.getPlayer().sendMessage(ChatColor.GOLD + "[SimpleZones] You are now leaving a Sanctuary.");
         	}
-            if(from.getLandType() == LandType.TOWN) {
-                if(to.getLandType() == LandType.PLOT)
+            if(from != null && from.getLandType() == LandType.TOWN) {
+                if(to != null && to.getLandType() == LandType.PLOT)
                     if(((Plot)to).getTown() == from)
                         return;
                 event.getPlayer().sendMessage(ChatColor.GOLD + "[SimpleZones] You are now leaving " + ((Town)from).getName());
             }
-            if(to.getLandType() == LandType.SANCTUARY) {
+            if(to != null && to.getLandType() == LandType.SANCTUARY) {
             	event.getPlayer().sendMessage(ChatColor.GOLD + "[SimpleZones] You are now entering a Sanctuary.");
             }
-            if(to.getLandType() == LandType.TOWN) {
-                if(from.getLandType() == LandType.PLOT)
+            if(to != null && to.getLandType() == LandType.TOWN) {
+                if(from != null && from.getLandType() == LandType.PLOT)
                     if(((Plot)from).getTown() == to)
                         return;
                 ZonePlayer zp = ZonePlayer.findUser(event.getPlayer());

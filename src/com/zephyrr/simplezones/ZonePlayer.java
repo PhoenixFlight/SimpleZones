@@ -681,7 +681,7 @@ public class ZonePlayer {
     public boolean outpostCreate() {
         if (corner1 == null || corner2 == null || (corner1.getBlockX() == 0 && corner1.getBlockY() == 0 && corner1.getBlockZ() == 0)) {
             player.sendMessage(ChatColor.RED + "[SimpleZones] You need to define points first.");
-        } else if (OwnedLand.hasOverlap(corner1, corner2, true)) {
+        } else if (OwnedLand.hasOverlap(corner1, corner2, false)) {
             player.sendMessage(ChatColor.RED + "[SimpleZones] This area overlaps with another section of claimed land.");
         } else if(getOutpostCount() >= SimpleZones.getPlugConfig().getInt("outposts.maxCount")) { 
         	player.sendMessage(ChatColor.RED + "[SimpleZones] You have already reached the maximum number of outposts.");
@@ -697,6 +697,7 @@ public class ZonePlayer {
                 if(p.getID() >= max)
                     max = p.getID() + 1;
             Outpost p = new Outpost(max, corner1, corner2);
+            Outpost.getOutposts().put(max,  p);
             p.setOwner(getName());
             setOutpostCount(getOutpostCount() + 1);
             player.sendMessage(ChatColor.GOLD + "[SimpleZones] You have added a new outpost!");
