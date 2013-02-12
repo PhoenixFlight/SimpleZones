@@ -1,6 +1,6 @@
 name: SimpleZones
 main: com.zephyrr.simplezones.SimpleZones
-version: 0.6
+version: 0.8
 author: PhoenixFlight
 permissions:
   Zone.*:
@@ -23,6 +23,38 @@ permissions:
       Zone.massmail: true
       Zone.flag: true
       Zone.help: true
+      Zone.outpost.*: true
+  Zone.outpost.*:
+    description: Grants all Zone Outpost commands.
+    children: 
+      Zone.outpost.define: true
+      Zone.outpost.create: true
+      Zone.outpost.addmember: true
+      Zone.outpost.removemember: true
+      Zone.outpost.delete: true
+      Zone.outpost.setowner: true
+      Zone.outpost.flag: true
+  Zone.outpost.define:
+    description: Allows a user to define an area for their outpost.
+    default: true
+  Zone.outpost.create:
+    description: Allows a user to create an outpost.
+    default: true
+  Zone.outpost.addmember:
+    description: Allows a user to add additional members to an outpost that they own.
+    default: true
+  Zone.outpost.delete:
+    description: Allows a user to delete their outpost.
+    default: true
+  Zone.outpost.removemember:
+    description: Allows a user to remove members from their outpost.
+    default: true
+  Zone.outpost.setowner:
+    description: Allows a user to transfer ownership of their outpost.
+    default: true
+  Zone.outpost.flag:
+    description: Allows a user to set flags for their outpost.
+    default: true
   Zone.admin.*:
     description: Grants all Zone Admin commands.
     children:

@@ -138,4 +138,12 @@ public class Sanctuary extends OwnedLand {
 			return true;
 		return false;
 	}
+	@Override
+	public boolean isBlocked(Object o) {
+		return false;
+	}
+	@Override
+	public LandType getLandType() {
+		return LandType.SANCTUARY;
+	}
 }

@@ -55,7 +55,8 @@ public class BlockFlag implements Flag {
                 blockedBlocks.put(Material.getMaterial(data[i]), true);
     }
 
-    public void loadDefaults() {
+    @Override
+	public void loadDefaults() {
         String[] dataIn = SimpleZones.getPlugConfig().getString("default-flags.blocks.simple-default").split(",");
         int[] data = new int[dataIn.length];
         for(int i = 0; i < dataIn.length; i++) {
@@ -72,13 +73,15 @@ public class BlockFlag implements Flag {
                 blockedBlocks.put(Material.getMaterial(data[i]), false);
     }
 
-    public void loadTownSets(String s) {
+    @Override
+	public void loadTownSets(String s) {
         String[] data = s.split(",");
         for(String d : data)
             blockedBlocks.put(Material.getMaterial(Integer.parseInt(d)), false);
     }
 
-    public void setBlocked(Object obj, boolean tf) {
+    @Override
+	public void setBlocked(Object obj, boolean tf) {
         Material mat = Material.getMaterial((Integer)obj);
         if(unblockable.contains(mat))
             return;
@@ -89,15 +92,18 @@ public class BlockFlag implements Flag {
         else blockedBlocks.remove(mat);
     }
 
-    public void setAll(boolean tf) {
+    @Override
+	public void setAll(boolean tf) {
         throw new UnsupportedOperationException("Not supported.");
     }
 
-    public boolean isBlocked(Object obj) {
-        return obj instanceof Material && blockedBlocks.containsKey((Material)obj);
+    @Override
+	public boolean isBlocked(Object obj) {
+        return obj instanceof Material && blockedBlocks.containsKey(obj);
     }
 
-    public String getData() {
+    @Override
+	public String getData() {
         String s = "";
         for(Material m : blockedBlocks.keySet())
             if(!blockedBlocks.get(m))

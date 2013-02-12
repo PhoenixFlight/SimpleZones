@@ -1,11 +1,15 @@
 package com.zephyrr.simplezones.flags;
 
 import org.bukkit.Material;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
+
+import com.zephyrr.simplezones.SimpleZones;
+import com.zephyrr.simplezones.land.LandType;
 
 /**
  *
@@ -48,17 +52,23 @@ public class FlagSet {
         flags[4].loadTownSets(e + "");
         flags[5].loadTownSets(f + "");
     }
-    public boolean isBlocked(Object obj) {
+    public boolean isBlocked(Object obj, LandType type) {
+    	FileConfiguration config = SimpleZones.getPlugConfig();
+    	String path = "";
+    	if(type == LandType.OUTPOST)
+    		path = "outpost.";
+    	else if(type == LandType.TOWN)
+    		path = "town.";
         if(obj instanceof EntityType) {
-            return flags[0].isBlocked(obj) || flags[1].isBlocked(obj);
+            return (!config.getBoolean(path + "monsterFlag") && flags[0].isBlocked(obj)) || (!config.getBoolean(path + "animalFlag") && flags[1].isBlocked(obj));
         } else if(obj instanceof Material) {
-            return flags[2].isBlocked(((Material)obj));
+            return !config.getBoolean(path + "blockFlag") && flags[2].isBlocked((obj));
         } else if(obj instanceof BlockBurnEvent || obj instanceof BlockSpreadEvent) {
-            return flags[3].isBlocked(null);
+            return !config.getBoolean(path + "fireFlag") && flags[3].isBlocked(null);
         } else if(obj instanceof ExplosionPrimeEvent) {
-            return flags[4].isBlocked(null);
+            return !config.getBoolean(path + "bombFlag") && flags[4].isBlocked(null);
         } else if(obj instanceof EntityDamageByEntityEvent) {
-        	return flags[5].isBlocked(obj);
+        	return !config.getBoolean(path + "pvpFlag") && flags[5].isBlocked(obj);
         }
         return false;
     }

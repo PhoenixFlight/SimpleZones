@@ -316,8 +316,13 @@ public class Town extends OwnedLand {
     		return supers.add(zp);
     	return supers.remove(zp);
     }
-    public boolean isBlocked(Object o) {
-        return flags.isBlocked(o);
+    @Override
+	public boolean isBlocked(Object o) {
+        return flags.isBlocked(o, LandType.TOWN);
+    }
+    @Override
+	public LandType getLandType() {
+    	return LandType.TOWN;
     }
     public String getData(char flag) {
         return flags.getData(flag);
@@ -360,7 +365,8 @@ public class Town extends OwnedLand {
         ZonePlayer.findUser(owner).getPlayer().sendMessage(ChatColor.GOLD + "[SimpleZones] You no longer own " + name);
         owner = newOwner;
     }
-    public boolean canBuild(Player p) {
+    @Override
+	public boolean canBuild(Player p) {
         ZonePlayer zp = ZonePlayer.findUser(p);
         if(owner.equals(zp.getName()))
             return true;

@@ -32,7 +32,8 @@ public class AnimalFlag implements Flag {
         loadDefaults();
     }
 
-    public void loadDefaults() {
+    @Override
+	public void loadDefaults() {
         blockList.put(EntityType.CHICKEN, SimpleZones.getPlugConfig().getBoolean("default-flags.animals.chicken"));
         blockList.put(EntityType.COW, SimpleZones.getPlugConfig().getBoolean("default-flags.animals.cow"));
         blockList.put(EntityType.IRON_GOLEM, SimpleZones.getPlugConfig().getBoolean("default-flags.animals.irongolem"));
@@ -44,7 +45,8 @@ public class AnimalFlag implements Flag {
         blockList.put(EntityType.WOLF, SimpleZones.getPlugConfig().getBoolean("default-flags.animals.wolf"));
     }
 
-    public void loadTownSets(String s) {
+    @Override
+	public void loadTownSets(String s) {
         String[] data = s.split(",");
         int i = 0;
         for (EntityType et : blockList.keySet()) {
@@ -52,23 +54,27 @@ public class AnimalFlag implements Flag {
         }
     }
 
-    public void setBlocked(Object obj, boolean tf) {
+    @Override
+	public void setBlocked(Object obj, boolean tf) {
         if (!(obj instanceof EntityType)) {
             return;
         }
         blockList.put((EntityType) obj, tf);
     }
 
-    public void setAll(boolean tf) {
+    @Override
+	public void setAll(boolean tf) {
         for(EntityType et : blockList.keySet())
             blockList.put(et, tf);
     }
 
-    public boolean isBlocked(Object obj) {
+    @Override
+	public boolean isBlocked(Object obj) {
         return obj instanceof EntityType && blockList.containsKey(obj) && blockList.get(obj);
     }
 
-    public String getData() {
+    @Override
+	public String getData() {
         String data = "";
         for (Boolean b : blockList.values()) {
             data += b + ",";

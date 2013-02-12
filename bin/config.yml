@@ -1,11 +1,30 @@
-version: 0.7
+version: 0.8
 wild:
   build: false
   break: true
-town:
-  maxSizeEnabled: false
+  opOverride: true
+outposts:
+  enabled: true
+  maxSizeEnabled: true
+  maxCount: 99
   maxX: 400
   maxZ: 400
+  monsterFlag: false
+  animalFlag: false
+  blockFlag: true
+  fireFlag: true
+  bombFlag: true
+  pvpFlag: true
+town:
+  maxSizeEnabled: false
+  maxX: 1000
+  maxZ: 1000
+  monsterFlag: true
+  animalFlag: true
+  blockFlag: true
+  fireFlag: true
+  bombFlag: true
+  pvpFlag: true
 sanctuary:
   opBuild: true
   playerBuild: false

@@ -1,9 +1,6 @@
 package com.zephyrr.simplezones.listeners;
 
 import com.zephyrr.simplezones.land.OwnedLand;
-import com.zephyrr.simplezones.land.Plot;
-import com.zephyrr.simplezones.land.Town;
-
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -23,9 +20,7 @@ public class DestructoListener implements Listener {
         OwnedLand owned = OwnedLand.getLandAtPoint(event.getSource().getLocation());
         if(owned == null)
             return;
-        if(owned instanceof Plot)
-            owned = ((Plot)owned).getTown();
-        if(((Town)owned).isBlocked(event))
+        if(owned.isBlocked(event))
             event.setCancelled(true);
     }
     @EventHandler
@@ -33,9 +28,7 @@ public class DestructoListener implements Listener {
         OwnedLand owned = OwnedLand.getLandAtPoint(event.getBlock().getLocation());
         if(owned == null)
             return;
-        if(owned instanceof Plot)
-            owned = ((Plot)owned).getTown();
-        if(((Town)owned).isBlocked(event))
+        if(owned.isBlocked(event))
             event.setCancelled(true);
     }
     @EventHandler
@@ -43,9 +36,7 @@ public class DestructoListener implements Listener {
         OwnedLand owned = OwnedLand.getLandAtPoint(event.getEntity().getLocation());
         if(owned == null)
             return;
-        if(owned instanceof Plot)
-            owned = ((Plot)owned).getTown();
-        if(((Town)owned).isBlocked(event))
+        if(owned.isBlocked(event))
             event.setRadius(0.0f);
         
     }

@@ -14,6 +14,8 @@ import org.bukkit.entity.Player;
 import org.yaml.snakeyaml.Yaml;
 import sqlibrary.Database;
 
+import com.zephyrr.simplezones.land.LandType;
+import com.zephyrr.simplezones.land.Outpost;
 import com.zephyrr.simplezones.land.OwnedLand;
 import com.zephyrr.simplezones.land.Plot;
 import com.zephyrr.simplezones.land.Sanctuary;
@@ -52,6 +54,7 @@ public class ZonePlayer {
                 }
                 ZonePlayer zp = new ZonePlayer(name, id);
                 zp.setTown(t);
+                zp.setOutpostCount(rs.getInt("OutCount"));
                 pMap.put(name, zp);
             }
         } catch (SQLException ex) {
@@ -75,7 +78,8 @@ public class ZonePlayer {
             String query = "INSERT INTO " + prefix + "players VALUES ("
                     + id + ","
                     + "'" + name + "',"
-                    + town
+                    + town + ","
+                    + zp.getOutpostCount()
                     + ")";
             db.query(query);
         }
@@ -101,6 +105,7 @@ public class ZonePlayer {
                 }
                 ZonePlayer zp = new ZonePlayer(name, id);
                 zp.setTown(t);
+                zp.setOutpostCount(pyml.outCount);
                 pMap.put(name, zp);
             }
             in.close();
@@ -122,6 +127,7 @@ public class ZonePlayer {
                 if(zp.getTown() == null)
                     pyml.tid = -1;
                 else pyml.tid = zp.getTown().getID();
+                pyml.outCount = zp.getOutpostCount();
                 al.add(pyml);
             }
             Yaml yml = new Yaml();
@@ -155,7 +161,8 @@ public class ZonePlayer {
     private Location corner1, corner2;
     private String name;
     private Channel active;
-
+    private int outpostCount;
+    
     public ZonePlayer(String name, int id) {
         player = SimpleZones.getPlayer(name);
         this.id = id;
@@ -165,7 +172,15 @@ public class ZonePlayer {
         corner1 = new Location(SimpleZones.getDefaultWorld(), 0, 0, 0);
         corner2 = corner1.clone();
     }
-
+    
+    public int getOutpostCount() {
+    	return outpostCount;
+    }
+    
+    public void setOutpostCount(int count) {
+    	outpostCount = count;
+    }
+    
     public int getID() {
         return id;
     }
@@ -186,7 +201,8 @@ public class ZonePlayer {
         return name;
     }
 
-    public boolean equals(Object o) {
+    @Override
+	public boolean equals(Object o) {
         if (!(o instanceof ZonePlayer)) {
             return false;
         }
@@ -310,8 +326,11 @@ public class ZonePlayer {
         if(args.length == 1) {
             showFlagList();
         } else {
-            town.setFlag(args[1]);
-            player.sendMessage(ChatColor.GOLD + "[SimpleZones] Flag request has been processed.");
+        	String msg = ChatColor.GOLD + "[SimpleZones] Flag request has been processed ";
+            if(town.setFlag(args[1]))
+            	msg += "successfully.";
+            else msg += "unsuccessfully.";
+            player.sendMessage(msg);
         }
         return true;
     }
@@ -367,10 +386,10 @@ public class ZonePlayer {
         return true;
     }
 
-    public boolean plotCreate(Database db, String prefix) {
+    public boolean plotCreate() {
         if (town == null || !town.getOwner().equals(name)) {
             player.sendMessage(ChatColor.RED + "[SimpleZones] You aren't the owner of a town. ");
-        } else if (corner2 == null || (corner1.getBlockX() == 0 && corner1.getBlockY() == 0 && corner1.getBlockZ() == 0)) {
+        } else if (corner1 == null || corner2 == null || (corner1.getBlockX() == 0 && corner1.getBlockY() == 0 && corner1.getBlockZ() == 0)) {
             player.sendMessage(ChatColor.RED + "[SimpleZones] You need to define points first.");
         } else if (OwnedLand.getLandAtPoint(corner1) != town || OwnedLand.getLandAtPoint(corner2) != town) {
             player.sendMessage(ChatColor.RED + "[SimpleZones] Your plot must be contained in your town.");
@@ -645,6 +664,141 @@ public class ZonePlayer {
     		Sanctuary.modSancts((Sanctuary)check);
     		player.sendMessage(ChatColor.GOLD + "[SimpleZones] This Sanctuary has been deleted.");
     	} else player.sendMessage(ChatColor.RED + "[SimpleZones] You aren't standing in a Sanctuary!");
+    	return true;
+    }
+    
+    /*************************************************************************************************
+     *                                         OUTPOSTS
+     ************************************************************************************************/
+    
+    public boolean outpostDefine() {
+        corner1 = null;
+        corner2 = null;
+        player.sendMessage(ChatColor.GOLD + "Strike the first corner of your new area.");
+        return true;
+    }
+    
+    public boolean outpostCreate() {
+        if (corner1 == null || corner2 == null || (corner1.getBlockX() == 0 && corner1.getBlockY() == 0 && corner1.getBlockZ() == 0)) {
+            player.sendMessage(ChatColor.RED + "[SimpleZones] You need to define points first.");
+        } else if (OwnedLand.hasOverlap(corner1, corner2, true)) {
+            player.sendMessage(ChatColor.RED + "[SimpleZones] This area overlaps with another section of claimed land.");
+        } else if(getOutpostCount() >= SimpleZones.getPlugConfig().getInt("outposts.maxCount")) { 
+        	player.sendMessage(ChatColor.RED + "[SimpleZones] You have already reached the maximum number of outposts.");
+        } else if(SimpleZones.getPlugConfig().contains("world." + corner1.getWorld().getName()) && !SimpleZones.getPlugConfig().getBoolean("world." + corner1.getWorld().getName())) {
+    		player.sendMessage(ChatColor.RED + "[SimpleZones] You cannot create outposts in this world.");
+    	} else if (SimpleZones.getPlugConfig().getBoolean("outposts.maxSizeEnabled") && (
+        		Math.max(corner1.getBlockX(), corner2.getBlockX()) - Math.min(corner1.getBlockX(), corner2.getBlockX()) > SimpleZones.getPlugConfig().getInt("outposts.maxX")
+        		|| Math.max(corner2.getBlockZ(), corner1.getBlockZ()) - Math.min(corner1.getBlockZ(), corner2.getBlockZ()) > SimpleZones.getPlugConfig().getInt("outposts.maxZ"))) {
+        	player.sendMessage(ChatColor.RED + "[SimpleZones] Your town has exceeded the maximum dimensions of " + SimpleZones.getPlugConfig().getInt("outposts.maxX") + "x" + SimpleZones.getPlugConfig().getInt("outposts.maxZ"));
+        } else {
+            int max = 0;
+            for(Outpost p : Outpost.getOutposts().values())
+                if(p.getID() >= max)
+                    max = p.getID() + 1;
+            Outpost p = new Outpost(max, corner1, corner2);
+            p.setOwner(getName());
+            setOutpostCount(getOutpostCount() + 1);
+            player.sendMessage(ChatColor.GOLD + "[SimpleZones] You have added a new outpost!");
+        }
+        return true;
+    }
+    
+    public boolean outpostDelete() {
+    	OwnedLand ol = OwnedLand.getLandAtPoint(getPlayer().getLocation());
+    	if(ol.getLandType() != LandType.OUTPOST) {
+    		player.sendMessage(ChatColor.RED + "[SimpleZones] You are not standing in an outpost.");
+    	} else {
+    		Outpost out = (Outpost)ol;
+    		if(!out.getOwner().equals(getName())) {
+    			player.sendMessage(ChatColor.RED + "[SimpleZones] You do not own this outpost.");
+    		} else {
+    			Outpost.getOutposts().remove(out.getID());
+    			setOutpostCount(getOutpostCount() - 1);
+    			OwnedLand.stripLocations(out);
+    			player.sendMessage(ChatColor.GOLD + "[SimpleZones] You have deleted this outpost.");
+    		}
+    	}
+    	return true;
+    }
+    
+    public boolean outpostAddMember(String newName) {
+    	OwnedLand ol = OwnedLand.getLandAtPoint(getPlayer().getLocation());
+    	if(ol.getLandType() != LandType.OUTPOST) {
+    		player.sendMessage(ChatColor.RED + "[SimpleZones] You are not standing in an outpost.");
+    	} else {
+    		Outpost out = (Outpost)ol;
+    		if(!out.getOwner().equals(getName())) {
+    			player.sendMessage(ChatColor.RED + "[SimpleZones] You do not own this outpost.");
+    		} else {
+    			if(!out.addMember(name))
+    				player.sendMessage(ChatColor.RED + name + " is already a member!");
+    			else player.sendMessage(ChatColor.GOLD + "[SimpleZones] You have added " + newName + " to your town.");
+    		}
+    	}
+    	return true;
+    }
+    
+    public boolean outpostRemoveMember(String newName) {
+    	OwnedLand ol = OwnedLand.getLandAtPoint(getPlayer().getLocation());
+    	if(ol.getLandType() != LandType.OUTPOST) {
+    		player.sendMessage(ChatColor.RED + "[SimpleZones] You are not standing in an outpost.");
+    	} else {
+    		Outpost out = (Outpost)ol;
+    		if(!out.getOwner().equals(getName())) {
+    			player.sendMessage(ChatColor.RED + "[SimpleZones] You do not own this outpost.");
+    		} else {
+    			if(!out.removeMember(name))
+    				player.sendMessage(ChatColor.RED + name + " is not a member!");
+    			else player.sendMessage(ChatColor.GOLD + "[SimpleZones] You have removed " + newName + " from your town.");
+    		}
+    	}
+    	return true;
+    }
+    
+    public boolean outpostSetOwner(String newName) {
+    	OwnedLand ol = OwnedLand.getLandAtPoint(getPlayer().getLocation());
+    	if(ol.getLandType() != LandType.OUTPOST) {
+    		player.sendMessage(ChatColor.RED + "[SimpleZones] You are not standing in an outpost.");
+    	} else {
+    		Outpost out = (Outpost)ol;
+    		if(!out.getOwner().equals(getName())) {
+    			player.sendMessage(ChatColor.RED + "[SimpleZones] You do not own this outpost.");
+    		} else if(findUser(newName).getOutpostCount() >= SimpleZones.getPlugConfig().getInt("outposts.maxCount")) { 
+    			player.sendMessage(ChatColor.RED + name + " has already reached the maximum number of outposts.");
+    		} else {
+    			if(!out.hasMember(name))
+    				player.sendMessage(ChatColor.RED + name + " is not a member of this outpost!");
+    			else {
+    				setOutpostCount(getOutpostCount() - 1);
+    				findUser(newName).setOutpostCount(findUser(newName).getOutpostCount() + 1);
+    				player.sendMessage(ChatColor.GOLD + "[SimpleZones] You have set " + newName + " to be the owner of your outpost.");
+    			}
+    		}
+    	}
+    	return true;
+    }
+    
+    public boolean outpostFlag(String[] args) {
+    	OwnedLand ol = OwnedLand.getLandAtPoint(getPlayer().getLocation());
+    	if(ol.getLandType() != LandType.OUTPOST) {
+    		player.sendMessage(ChatColor.RED + "[SimpleZones] You are not standing in an outpost.");
+    	} else {
+    		Outpost out = (Outpost)ol;
+    		if(!out.getOwner().equals(getName())) {
+    			player.sendMessage(ChatColor.RED + "[SimpleZones] You do not own this outpost.");
+    		} else {
+    	        if(args.length == 2) {
+    	            showFlagList();
+    	        } else {
+    	        	String msg = ChatColor.GOLD + "[SimpleZones] Flag request has been processed ";
+    	            if(out.setFlag(args[2]))
+    	            	msg += "successfully.";
+    	            else msg += "unsuccessfully.";
+    	            player.sendMessage(msg);
+    	        }
+	        }
+    	}
     	return true;
     }
 }

@@ -16,6 +16,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import sqlibrary.*;
 
+import com.zephyrr.simplezones.land.Outpost;
 import com.zephyrr.simplezones.land.Plot;
 import com.zephyrr.simplezones.land.Sanctuary;
 import com.zephyrr.simplezones.land.Town;
@@ -33,7 +34,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 public class SimpleZones extends JavaPlugin {
 
     private static JavaPlugin plug;
-    private static double VERSION = 0.7;
+    private static double VERSION = 0.8;
 
     public static Player getPlayer(String name) {
         return plug.getServer().getPlayer(name);
@@ -53,7 +54,8 @@ public class SimpleZones extends JavaPlugin {
     private Database db;
     private String prefix;
 
-    public void onEnable() {
+    @Override
+	public void onEnable() {
         SimpleZones.plug = this;
         prefix = getConfig().getString("database.prefix");
         String type = getConfig().getString("database.type");
@@ -84,6 +86,7 @@ public class SimpleZones extends JavaPlugin {
         Town.fillBans(db, prefix);
         Mail.fill(db, prefix);
         Sanctuary.fill(db, prefix);
+        Outpost.fill(db, prefix);
         if (!new File("plugins/SimpleZones/config.yml").exists()) 
             saveDefaultConfig();
         for(World w : getServer().getWorlds()) 
@@ -121,6 +124,7 @@ public class SimpleZones extends JavaPlugin {
         addColumnUnlessExists(prefix + "towns", "SuperUsers", "text");
         addColumnUnlessExists(prefix + "towns", "EntryMessage", "text");
         addColumnUnlessExists(prefix + "towns", "PvP", "boolean");
+        addColumnUnlessExists(prefix + "players", "OutCount", "int");
     }
 
     private void firstRun() {
@@ -133,6 +137,26 @@ public class SimpleZones extends JavaPlugin {
     				"HighZ int," +
     				"World text," +
     				"PRIMARY KEY (S_Id)" +
+    				")");
+    	}
+    	
+    	if(!db.checkTable(prefix + "outposts")) {
+    		db.createTable("CREATE TABLE " + prefix + "outposts (" +
+    				"O_Id int NOT NULL, " +
+    				"Owner varchar(255), " +
+    				"LowX int, " +
+    				"HighX int, " +
+    				"LowZ int, " +
+    				"HighZ int, " +
+    				"World varchar(255), " +
+    				"Animals text, " +
+    				"Blocks text, " +
+    				"Monsters text, " +
+    				"PvP boolean, " +
+    				"Fire boolean, " +
+    				"Bomb boolean, " +
+    				"Members text, " +
+    				"PRIMARY KEY (O_Id)" +
     				")");
     	}
     	
@@ -230,6 +254,25 @@ public class SimpleZones extends JavaPlugin {
             return false;
         }
         if (command.getName().equalsIgnoreCase("szone")) {
+        	if (args.length >= 2 && args[0].equalsIgnoreCase("outpost") && getConfig().getBoolean("outposts.enabled")) {
+        		if(args[1].equalsIgnoreCase("define") && send.hasPermission("Zone.outpost.define")) {
+        			return zoneSender.outpostDefine();
+        		} else if(args[1].equalsIgnoreCase("create") && send.hasPermission("Zone.outpost.create")) {
+        			return zoneSender.outpostCreate();
+        		} else if(args[1].equalsIgnoreCase("delete") && send.hasPermission("Zone.outpost.delete")) {
+        			return zoneSender.outpostDelete();
+        		} else if(args[1].equalsIgnoreCase("flag") && send.hasPermission("Zone.outpost.flag")) {
+    				return zoneSender.outpostFlag(args);
+    			} else if(args.length > 2) {
+        			if(args[1].equalsIgnoreCase("addmember") && send.hasPermission("Zone.outpost.addmember")) {
+        				return zoneSender.outpostAddMember(args[2]);
+        			} else if(args[1].equalsIgnoreCase("removemember") && send.hasPermission("Zone.outpost.removemember")) {
+        				return zoneSender.outpostRemoveMember(args[2]);
+        			} else if(args[1].equalsIgnoreCase("setowner") && send.hasPermission("Zone.outpost.setowner")) {
+        				return zoneSender.outpostSetOwner(args[2]);
+        			} 
+        		}
+        	}
             if (args.length >= 2 && args[0].equalsIgnoreCase("plot")) {
                 if (args[1].equalsIgnoreCase("define") && sender.hasPermission("Zone.plot.define")) {
                     return zoneSender.plotDefine();
@@ -244,7 +287,7 @@ public class SimpleZones extends JavaPlugin {
                     }
                     return zoneSender.plotRemoveMember(args[2]);
                 } else if (args[1].equalsIgnoreCase("create") && sender.hasPermission("Zone.plot.create")) {
-                    return zoneSender.plotCreate(db, prefix);
+                    return zoneSender.plotCreate();
                 } else if (args[1].equalsIgnoreCase("delete") && sender.hasPermission("Zone.plot.delete")) {
                     return zoneSender.plotDelete();
                 }
@@ -260,10 +303,10 @@ public class SimpleZones extends JavaPlugin {
             	return true;
             } else if (args[0].equalsIgnoreCase("flag") && sender.hasPermission("Zone.flag")) {
                 return zoneSender.flag(args);
-            } else if (args[0].equalsIgnoreCase("aIdList") && sender.hasPermission("Zone.flag")) {
+            } else if (args[0].equalsIgnoreCase("aIdList") && (sender.hasPermission("Zone.flag") || sender.hasPermission("Zone.outpost.flag"))) {
                 showAIDs(sender);
                 return true;
-            } else if (args[0].equalsIgnoreCase("mIdList") && sender.hasPermission("Zone.flag")) {
+            } else if (args[0].equalsIgnoreCase("mIdList") && (sender.hasPermission("Zone.flag") || sender.hasPermission("Zone.outpost.flag"))) {
                 showMIDs(sender);
                 return true;
             } else if(args[0].equalsIgnoreCase("super") && sender.hasPermission("Zone.super")) {
@@ -591,13 +634,15 @@ public class SimpleZones extends JavaPlugin {
         }
     }
 
-    public void onDisable() {
+    @Override
+	public void onDisable() {
         Town.save(db, prefix);
         Plot.save(db, prefix);
         ZonePlayer.save(db, prefix);
         Town.saveBans(db, prefix);
         Mail.save(db, prefix);
         Sanctuary.save(db, prefix);
+        Outpost.save(db, prefix);
         if (db != null) {
             db.close();
         }

@@ -147,12 +147,21 @@ public class Plot extends OwnedLand {
     public Town getTown() {
         return town;
     }
-    public boolean canBuild(Player p) {
+    @Override
+	public boolean canBuild(Player p) {
         ZonePlayer zp = ZonePlayer.findUser(p);
         if(getMembers().contains(p.getName()))
             return true;
         if(town.getOwner().equals(zp.getName()))
             return true;
         return false;
+    }
+    @Override
+	public boolean isBlocked(Object o) {
+    	return town.isBlocked(o);
+    }
+    @Override
+	public LandType getLandType() {
+    	return LandType.PLOT;
     }
 }

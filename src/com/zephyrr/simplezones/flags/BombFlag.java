@@ -8,27 +8,33 @@ public class BombFlag implements Flag {
         loadDefaults();
     }
 
-    public void loadDefaults() {
+    @Override
+	public void loadDefaults() {
         blocked = SimpleZones.getPlugConfig().getBoolean("default-flags.explode.blocked");
     }
 
-    public void loadTownSets(String s) {
+    @Override
+	public void loadTownSets(String s) {
         blocked = Boolean.parseBoolean(s);
     }
 
-    public void setBlocked(Object obj, boolean tf) {
+    @Override
+	public void setBlocked(Object obj, boolean tf) {
         blocked = tf;
     }
 
-    public void setAll(boolean tf) {
+    @Override
+	public void setAll(boolean tf) {
         throw new UnsupportedOperationException("Not supported.");
     }
 
-    public boolean isBlocked(Object obj) {
+    @Override
+	public boolean isBlocked(Object obj) {
         return blocked;
     }
 
-    public String getData() {
+    @Override
+	public String getData() {
         return blocked + "";
     }
 }

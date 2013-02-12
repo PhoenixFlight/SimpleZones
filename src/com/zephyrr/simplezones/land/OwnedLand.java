@@ -98,5 +98,7 @@ public abstract class OwnedLand {
     public int getID() {
         return id;
     }
+    public abstract boolean isBlocked(Object o);
     public abstract boolean canBuild(Player p);
+    public abstract LandType getLandType();
 }

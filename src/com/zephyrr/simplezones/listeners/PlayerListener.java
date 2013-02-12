@@ -11,10 +11,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import com.zephyrr.simplezones.Channel;
-import com.zephyrr.simplezones.land.OwnedLand;
-import com.zephyrr.simplezones.land.Plot;
-import com.zephyrr.simplezones.land.Sanctuary;
-import com.zephyrr.simplezones.land.Town;
+import com.zephyrr.simplezones.land.*;
 
 import java.util.HashSet;
 
@@ -35,20 +32,24 @@ public class PlayerListener implements Listener {
         OwnedLand from = OwnedLand.getLandAtPoint(event.getFrom());
         OwnedLand to = OwnedLand.getLandAtPoint(event.getTo());
         if(from != to) {
-        	if(from instanceof Sanctuary) {
+        	if(from.getLandType() == LandType.OUTPOST)
+        		event.getPlayer().sendMessage(ChatColor.GOLD + "[SimpleZones] You are now leaving an outpost.");
+        	if(to.getLandType() == LandType.OUTPOST)
+        		event.getPlayer().sendMessage(ChatColor.GOLD + "[SimpleZones] You are now entering an outpost belonging to " + ((Outpost)to).getOwner());
+        	if(from.getLandType() == LandType.SANCTUARY) {
         		event.getPlayer().sendMessage(ChatColor.GOLD + "[SimpleZones] You are now leaving a Sanctuary.");
         	}
-            if(from instanceof Town) {
-                if(to instanceof Plot)
+            if(from.getLandType() == LandType.TOWN) {
+                if(to.getLandType() == LandType.PLOT)
                     if(((Plot)to).getTown() == from)
                         return;
                 event.getPlayer().sendMessage(ChatColor.GOLD + "[SimpleZones] You are now leaving " + ((Town)from).getName());
             }
-            if(to instanceof Sanctuary) {
+            if(to.getLandType() == LandType.SANCTUARY) {
             	event.getPlayer().sendMessage(ChatColor.GOLD + "[SimpleZones] You are now entering a Sanctuary.");
             }
-            if(to instanceof Town) {
-                if(from instanceof Plot)
+            if(to.getLandType() == LandType.TOWN) {
+                if(from.getLandType() == LandType.PLOT)
                     if(((Plot)from).getTown() == to)
                         return;
                 ZonePlayer zp = ZonePlayer.findUser(event.getPlayer());
@@ -67,9 +68,9 @@ public class PlayerListener implements Listener {
         if(ol == null)
             return;
         Town toCheck;
-        if(ol instanceof Plot)
+        if(ol.getLandType() == LandType.PLOT)
             toCheck = ((Plot)ol).getTown();
-        else if(ol instanceof Sanctuary)
+        else if(ol.getLandType() == LandType.SANCTUARY)
         	return;
         else toCheck = (Town)ol;
         if(!toCheck.getOwner().equals(event.getPlayer().getName()) && !ol.getMembers().contains(event.getPlayer().getName()))
@@ -78,15 +79,9 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onEntityDamage(EntityDamageByEntityEvent event) {
     	OwnedLand ol = OwnedLand.getLandAtPoint(event.getEntity().getLocation());
-    	if(ol == null || ol instanceof Sanctuary)
+    	if(ol == null)
     		return;
-    	Town t;
-    	if(ol instanceof Plot)
-    		t = ((Plot)ol).getTown();
-    	else if(ol instanceof Town)
-    		t = (Town)ol;
-    	else return;
-    	if(t.isBlocked(event))
+    	if(ol.isBlocked(event))
     		event.setCancelled(true);
     }
     @EventHandler

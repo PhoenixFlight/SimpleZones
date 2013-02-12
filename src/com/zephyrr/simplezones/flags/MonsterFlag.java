@@ -38,7 +38,8 @@ public class MonsterFlag implements Flag {
         loadDefaults();
     }
 
-    public void loadDefaults() {
+    @Override
+	public void loadDefaults() {
         FileConfiguration fc = SimpleZones.getPlugConfig();
         blockMap.put(EntityType.BLAZE, fc.getBoolean("default-flags.monsters.blaze"));
         blockMap.put(EntityType.CAVE_SPIDER, fc.getBoolean("default-flags.monsters.cave_spider"));
@@ -57,14 +58,16 @@ public class MonsterFlag implements Flag {
         blockMap.put(EntityType.ZOMBIE, fc.getBoolean("default-flags.monsters.zombie"));
     }
 
-    public void loadTownSets(String s) {
+    @Override
+	public void loadTownSets(String s) {
         String[] data = s.split(",");
         int i = 0;
         for(EntityType et : blockMap.keySet())
             blockMap.put(et, Boolean.parseBoolean(data[i++]));
     }
 
-    public String getData() {
+    @Override
+	public String getData() {
         String data = "";
         for(Boolean b : blockMap.values())
             data += b + ",";
@@ -73,17 +76,20 @@ public class MonsterFlag implements Flag {
         return data;
     }
 
-    public void setBlocked(Object obj, boolean tf) {
+    @Override
+	public void setBlocked(Object obj, boolean tf) {
         if(!(obj instanceof EntityType))
             return;
         blockMap.put((EntityType)obj, tf);
     }
 
-    public boolean isBlocked(Object obj) {
+    @Override
+	public boolean isBlocked(Object obj) {
         return obj instanceof EntityType && blockMap.containsKey(obj) && blockMap.get(obj);
     }
 
-    public void setAll(boolean tf) {
+    @Override
+	public void setAll(boolean tf) {
         for(EntityType et : blockMap.keySet())
             blockMap.put(et, tf);
     }

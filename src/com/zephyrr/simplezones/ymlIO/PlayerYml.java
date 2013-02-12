@@ -8,4 +8,5 @@ public class PlayerYml {
     public int id;
     public String name;
     public int tid;
+    public int outCount;
 }
