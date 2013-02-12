@@ -67,13 +67,16 @@ public class PlayerListener implements Listener {
         OwnedLand ol = OwnedLand.getLandAtPoint(event.getClickedBlock().getLocation());
         if(ol == null)
             return;
-        Town toCheck;
+        String owner = "";
         if(ol.getLandType() == LandType.PLOT)
-            toCheck = ((Plot)ol).getTown();
+            owner = ((Plot)ol).getTown().getOwner();
         else if(ol.getLandType() == LandType.SANCTUARY)
         	return;
-        else toCheck = (Town)ol;
-        if(!toCheck.getOwner().equals(event.getPlayer().getName()) && !ol.getMembers().contains(event.getPlayer().getName()))
+        else if(ol.getLandType() == LandType.TOWN)
+        	owner = ((Town)ol).getOwner();
+        else if(ol.getLandType() == LandType.OUTPOST)
+        	owner = ((Outpost)ol).getOwner();
+        if(owner.equals(event.getPlayer().getName()) && !ol.getMembers().contains(event.getPlayer().getName()))
             event.setCancelled(true);
     }
     @EventHandler
