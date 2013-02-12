@@ -707,7 +707,7 @@ public class ZonePlayer {
     
     public boolean outpostDelete() {
     	OwnedLand ol = OwnedLand.getLandAtPoint(getPlayer().getLocation());
-    	if(ol.getLandType() != LandType.OUTPOST) {
+    	if(ol == null || ol.getLandType() != LandType.OUTPOST) {
     		player.sendMessage(ChatColor.RED + "[SimpleZones] You are not standing in an outpost.");
     	} else {
     		Outpost out = (Outpost)ol;
@@ -725,7 +725,7 @@ public class ZonePlayer {
     
     public boolean outpostAddMember(String newName) {
     	OwnedLand ol = OwnedLand.getLandAtPoint(getPlayer().getLocation());
-    	if(ol.getLandType() != LandType.OUTPOST) {
+    	if(ol == null || ol.getLandType() != LandType.OUTPOST) {
     		player.sendMessage(ChatColor.RED + "[SimpleZones] You are not standing in an outpost.");
     	} else {
     		Outpost out = (Outpost)ol;
@@ -742,7 +742,7 @@ public class ZonePlayer {
     
     public boolean outpostRemoveMember(String newName) {
     	OwnedLand ol = OwnedLand.getLandAtPoint(getPlayer().getLocation());
-    	if(ol.getLandType() != LandType.OUTPOST) {
+    	if(ol == null || ol.getLandType() != LandType.OUTPOST) {
     		player.sendMessage(ChatColor.RED + "[SimpleZones] You are not standing in an outpost.");
     	} else {
     		Outpost out = (Outpost)ol;
@@ -759,7 +759,7 @@ public class ZonePlayer {
     
     public boolean outpostSetOwner(String newName) {
     	OwnedLand ol = OwnedLand.getLandAtPoint(getPlayer().getLocation());
-    	if(ol.getLandType() != LandType.OUTPOST) {
+    	if(ol == null || ol.getLandType() != LandType.OUTPOST) {
     		player.sendMessage(ChatColor.RED + "[SimpleZones] You are not standing in an outpost.");
     	} else {
     		Outpost out = (Outpost)ol;
@@ -782,7 +782,7 @@ public class ZonePlayer {
     
     public boolean outpostFlag(String[] args) {
     	OwnedLand ol = OwnedLand.getLandAtPoint(getPlayer().getLocation());
-    	if(ol.getLandType() != LandType.OUTPOST) {
+    	if(ol == null || ol.getLandType() != LandType.OUTPOST) {
     		player.sendMessage(ChatColor.RED + "[SimpleZones] You are not standing in an outpost.");
     	} else {
     		Outpost out = (Outpost)ol;
