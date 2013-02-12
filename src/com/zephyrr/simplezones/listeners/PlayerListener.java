@@ -76,7 +76,8 @@ public class PlayerListener implements Listener {
         	owner = ((Town)ol).getOwner();
         else if(ol.getLandType() == LandType.OUTPOST)
         	owner = ((Outpost)ol).getOwner();
-        if(owner.equals(event.getPlayer().getName()) && !ol.getMembers().contains(event.getPlayer().getName()))
+        event.getPlayer().sendMessage(ol.getMembers().toString());
+        if(!(owner.equals(event.getPlayer().getName()) || ol.getMembers().contains(event.getPlayer().getName())))
             event.setCancelled(true);
     }
     @EventHandler

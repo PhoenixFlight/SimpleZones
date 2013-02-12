@@ -34,6 +34,10 @@ permissions:
       Zone.outpost.delete: true
       Zone.outpost.setowner: true
       Zone.outpost.flag: true
+      Zone.outpost.members: true
+  Zone.outpost.members:
+    description: Allows a user to view the members of the outpost they're standing in.
+    default: true
   Zone.outpost.define:
     description: Allows a user to define an area for their outpost.
     default: true
