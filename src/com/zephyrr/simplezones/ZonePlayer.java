@@ -768,10 +768,10 @@ public class ZonePlayer {
     		} else if (findUser(newName) == null) { 
     			player.sendMessage(ChatColor.RED + "[SimpleZones] " + newName + " does not exist.");
     		} else if(findUser(newName).getOutpostCount() >= SimpleZones.getPlugConfig().getInt("outposts.maxCount")) { 
-    			player.sendMessage(ChatColor.RED + "[SimpleZones] " + name + " has already reached the maximum number of outposts.");
+    			player.sendMessage(ChatColor.RED + "[SimpleZones] " + newName + " has already reached the maximum number of outposts.");
     		} else {
     			if(!out.hasMember(name))
-    				player.sendMessage(ChatColor.RED + "[SimpleZones] " + name + " is not a member of this outpost!");
+    				player.sendMessage(ChatColor.RED + "[SimpleZones] " + newName + " is not a member of this outpost!");
     			else {
     				setOutpostCount(getOutpostCount() - 1);
     				findUser(newName).setOutpostCount(findUser(newName).getOutpostCount() + 1);
