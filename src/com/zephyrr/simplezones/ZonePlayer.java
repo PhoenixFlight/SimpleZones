@@ -300,9 +300,9 @@ public class ZonePlayer {
         ArrayList<String> flags = new ArrayList<String>();
         flags.add("f - Enable/disable the spreading and burning of objects.  Fire can still be placed, but it won't do any damage.");
         flags.add("e - Enable/disable explosions.  This includes creepers, TNT, and anything else that goes boom.");
-        flags.add("b# - Blocks or unblocks the placing of the block with id # in your town.  Example: /zone flag +b17 will block users from placing Wood in your town.");
-        flags.add("m[#] - Blocks or unblocks all or specific monsters.  Specific monster listings are available via /zone mIdList.  Example: /zone flag +m4 will block Creepers from your town.");
-        flags.add("a[#] - Blocks or unblocks all or specific animals.  Specific animal listings are available via /zone aIdList.  Example: /zone flag +a2 will block Chickens from your town.");
+        flags.add("b# - Blocks or unblocks the placing of the block with id # in your town.  Example: /szone [outpost] flag +b17 will block users from placing Wood in your town.");
+        flags.add("m[#] - Blocks or unblocks all or specific monsters.  Specific monster listings are available via /szone [outpost] mIdList.  Example: /szone flag +m4 will block Creepers from your town.");
+        flags.add("a[#] - Blocks or unblocks all or specific animals.  Specific animal listings are available via /szone [outpost] aIdList.  Example: /szone outpost flag +a2 will block Chickens from your outpost.");
         player.sendMessage(ChatColor.GOLD + "[SimpleZones] Town Flags");
         for(String s : flags)
             player.sendMessage(ChatColor.GOLD + s);
