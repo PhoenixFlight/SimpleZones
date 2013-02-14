@@ -60,15 +60,15 @@ public class FlagSet {
     	else if(type == LandType.TOWN)
     		path = "town.";
         if(obj instanceof EntityType) {
-            return (!config.getBoolean(path + "monsterFlag") && flags[0].isBlocked(obj)) || (!config.getBoolean(path + "animalFlag") && flags[1].isBlocked(obj));
+            return (config.getBoolean(path + "monsterFlag") && flags[0].isBlocked(obj)) || (config.getBoolean(path + "animalFlag") && flags[1].isBlocked(obj));
         } else if(obj instanceof Material) {
-            return !config.getBoolean(path + "blockFlag") && flags[2].isBlocked((obj));
+            return config.getBoolean(path + "blockFlag") && flags[2].isBlocked((obj));
         } else if(obj instanceof BlockBurnEvent || obj instanceof BlockSpreadEvent) {
-            return !config.getBoolean(path + "fireFlag") && flags[3].isBlocked(null);
+            return config.getBoolean(path + "fireFlag") && flags[3].isBlocked(null);
         } else if(obj instanceof ExplosionPrimeEvent) {
-            return !config.getBoolean(path + "bombFlag") && flags[4].isBlocked(null);
+            return config.getBoolean(path + "bombFlag") && flags[4].isBlocked(null);
         } else if(obj instanceof EntityDamageByEntityEvent) {
-        	return !config.getBoolean(path + "pvpFlag") && flags[5].isBlocked(obj);
+        	return config.getBoolean(path + "pvpFlag") && flags[5].isBlocked(obj);
         }
         return false;
     }
